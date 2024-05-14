@@ -1,10 +1,19 @@
 function authorize() {
-    // Authorization URL is included in the initial HTML response
-    var authorizationUrl = '<?= authorizationUrl ?>';
+    // Send a GET request to the GAS endpoint to obtain the authorization URL
+    fetch('https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec')
+        .then(response => response.json())
+        .then(data => {
+            // Extract the authorization URL from the response data
+            var authorizationUrl = data.authorizationUrl;
 
-    // Open the authorization URL in a new window/tab
-    window.open(authorizationUrl, '_blank');
-  }
+            // Open the authorization URL in a new window/tab
+            window.open(authorizationUrl, '_blank');
+        })
+        .catch(error => {
+            console.error('Error fetching authorization URL:', error);
+            // Handle error appropriately
+        });
+}
 
   // Declare termSelectionMessageDisplayed outside of the terms function
   var termSelectionMessageDisplayed = false;
