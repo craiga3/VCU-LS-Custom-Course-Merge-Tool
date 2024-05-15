@@ -8,7 +8,7 @@ function authorize() {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'action=login' 
+      body: 'action=login&accessToken=NULL' 
     })
     .then(response => response.json())
     .then(data => {
