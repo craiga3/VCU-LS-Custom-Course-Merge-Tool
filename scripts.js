@@ -37,16 +37,16 @@ function authorize() {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'action=exchangeCode&accessToken=NULL&code=' + code 
+        body: 'action=exchangeCode&accessToken=NULL&code=' + code
       })
       .then(response => response.json())
       .then(data => {
         if (data.accessToken) {
-          // Store the access token
+          // Store the access token in sessionStorage
           sessionStorage.setItem('accessToken', data.accessToken);
   
-          // Redirect to the main application page
-          window.location.replace('https://craiga3.github.io'); 
+          // Redirect to the main application page, INCLUDING the access token in the URL
+          window.location.replace('https://craiga3.github.io/?accessToken=' + data.accessToken); 
         } else {
           console.error("Error exchanging code for access token:", data.error);
         }
