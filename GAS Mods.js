@@ -46,8 +46,8 @@ function getAccessToken(code) {
   var domain = PropertiesService.getScriptProperties().getProperty('domain_instance');
   var client_id = PropertiesService.getScriptProperties().getProperty('oauth_client_id');
   var client_sec = PropertiesService.getScriptProperties().getProperty('oauth_client_secret');
-  var redirect_uri = ScriptApp.getService().getUrl();
-
+  //var redirect_uri = ScriptApp.getService().getUrl();
+  var redirect_uri = PropertiesService.getScriptProperties().getProperty('redirect_uri');
   var tokenUrl = domain + '/login/oauth2/token';
 
   var payload = {
@@ -109,7 +109,19 @@ function doPost(e) {
 
       case 'login':
         var authorizationUrl = getAuthorizationUrl();
-        return ContentService.createTextOutput(JSON.stringify({ authorizationUrl: authorizationUrl })).setMimeType(ContentService.MimeType.JSON);  
+        return ContentService.createTextOutput(JSON.stringify({ authorizationUrl: authorizationUrl })).setMimeType(ContentService.MimeType.JSON); 
+
+        case 'exchangeCode':
+        if (e.parameter.code) { 
+          var accessToken = getAccessToken(e.parameter.code); 
+          return ContentService.createTextOutput(JSON.stringify({ accessToken: accessToken }))
+            .setMimeType(ContentService.MimeType.JSON)
+            .setHeader('Access-Control-Allow-Origin', '*');
+        } else {
+          return ContentService.createTextOutput("No authorization code provided.")
+            .setMimeType(ContentService.MimeType.JSON)
+            .setHeader('Access-Control-Allow-Origin', '*');
+        } 
 
       case 'terms':
        // return getTerms(e.parameter.accessToken);
