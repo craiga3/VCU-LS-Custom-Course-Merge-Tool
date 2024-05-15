@@ -1,627 +1,640 @@
-function authorize() {
-    // Send a GET request to the GAS endpoint to obtain the authorization URL
-    fetch('https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec')
-        .then(response => response.json())
-        .then(data => {
-            // Extract the authorization URL from the response data
-            var authorizationUrl = data.authorizationUrl;
+// Declare termSelectionMessageDisplayed outside of the terms function
+var termSelectionMessageDisplayed = false;
 
-            // Open the authorization URL in a new window/tab
-            window.open(authorizationUrl, '_blank');
-        })
-        .catch(error => {
-            console.error('Error fetching authorization URL:', error);
-            // Handle error appropriately
-        });
+function authorize() {
+  // Authorization URL is included in the initial HTML response
+  var authorizationUrl = '<?= authorizationUrl ?>';
+
+  // Open the authorization URL in a new window/tab
+  window.open(authorizationUrl, '_blank');
 }
 
-  // Declare termSelectionMessageDisplayed outside of the terms function
-  var termSelectionMessageDisplayed = false;
+function terms() {
+  // Disable the 'Next' button while loading
+  var nextButton = document.querySelector('.buttonmain');
+  nextButton.classList.add('loading', 'blue');
+  nextButton.innerHTML = 'Loading';
+  nextButton.disabled = true;
 
-  function terms() {
-    // Disable the 'Next' button while loading
-    var nextButton = document.querySelector('.buttonmain');
-    nextButton.classList.add('loading', 'blue');
-    nextButton.innerHTML = 'Loading';
-    nextButton.disabled = true;
+  // Reset the flag when 'Next' button is clicked
+  termSelectionMessageDisplayed = false;
 
-    // Reset the flag when 'Next' button is clicked
-    termSelectionMessageDisplayed = false;
+  // Retrieve access token from sessionStorage
+  var accessToken = sessionStorage.getItem('accessToken');
 
-    // Retrieve access token from sessionStorage
-    var accessToken = sessionStorage.getItem('accessToken');
-
-    // Send a request to the Google Apps Script endpoint for enrollment terms
-    fetch('https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec', {
-      redirect: "follow",
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'action=terms' + '&accessToken=' + encodeURIComponent(accessToken)
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Handle the returned data (enrollment terms) here
-        console.log(data);
-        // Update your HTML with the received data
-        displayTerms(data);
-      })
-      .catch(error => {
-        console.error('Error fetching enrollment terms:', error);
-        // Handle error appropriately
-
-        // Re-enable the 'Next' button if there's an error
-        resetNextButton();
-      });
-  }
-
-  function displayTerms(terms) {
-    // Get the container element to replace its content
-    var processContainer = document.getElementById('process-container');
-
-    // Clear existing content
-    while (processContainer.firstChild) {
-      processContainer.removeChild(processContainer.firstChild);
-    }
-
-    // Add a header for the "Select Term" section
-    var header = document.createElement('h2');
-    header.textContent = 'Select Term';
-    processContainer.appendChild(header);
-
-    // Instructions for Selecting Term
-    var instructions = document.createElement('p');
-    instructions.innerHTML = 'Please select the term for the courses you\'d like to merge:';
-    processContainer.appendChild(instructions);
-
-    // Create a form element to hold the radio buttons
-    var form = document.createElement('form');
-
-    // Iterate through the terms and create a radio button for each
-    terms.forEach(term => {
-      var label = document.createElement('label');
-      label.innerHTML = '<input type="radio" name="term" value="' + term.id + '"> ' + term.name;
-      form.appendChild(label);
-      form.appendChild(document.createElement('br'));
-    });
-
-    // Create a button to proceed to the next step
-    var nextButton = document.createElement('button');
-    nextButton.className = 'buttonmain';
-    nextButton.innerHTML = 'Next';
-    nextButton.onclick = function () {
-      // Get the selected term ID
-      var selectedTermId;
-      var radioButtons = form.elements['term'];
-      for (var i = 0; i < radioButtons.length; i++) {
-        if (radioButtons[i].checked) {
-          selectedTermId = radioButtons[i].value;
-          break;
-        }
-      }
-
-      // Clear the message if it was displayed before
-      var selectionMessage = processContainer.querySelector('.reminder.selection');
-      if (selectionMessage) {
-        processContainer.removeChild(selectionMessage);
-      }
-
-      if (!selectedTermId) {
-        // Display a message in the div
-        var selectionMessage = document.createElement('p');
-        selectionMessage.classList.add('reminder', 'selection');
-        selectionMessage.innerHTML = 'Please make a selection before continuing.';
-        processContainer.appendChild(selectionMessage);
-
-        // Set the flag to true so that the message is not displayed again
-        termSelectionMessageDisplayed = true;
-
-        // Re-enable the 'Next' button
-        resetNextButton();
-        return;
-      }
-
-      // Reset the flag when 'Next' button is clicked
-      termSelectionMessageDisplayed = false;
-
-      // Perform the next step based on the selected term ID (e.g., show courses)
-      // ...
-
-      // For demonstration purposes, log the selected term ID
-      console.log('Selected Term ID:', selectedTermId);
-
-      // Trigger the getEnrollments action with the selected term ID
-      getEnrollments(selectedTermId);
-    };
-
-    // Add the form and next button to the process container
-    processContainer.appendChild(form);
-    processContainer.appendChild(nextButton);
-  }
-
-  // Assume resetNextButton function resets the 'Next' button state
-  function resetNextButton() {
-    var nextButton = document.querySelector('.buttonmain');
-    nextButton.classList.remove('loading', 'blue');
-    nextButton.innerHTML = 'Next';
-    nextButton.disabled = false;
-  }
-
-
-
-
-  function getEnrollments(enrollmentTermId) {
-    // Disable the 'Next' button while loading
-    var nextButton = document.querySelector('.buttonmain');
-    nextButton.classList.add('loading', 'blue');
-    nextButton.innerHTML = 'Loading';
-    nextButton.disabled = true;
-
-    // Retrieve access token from sessionStorage
-    var accessToken = sessionStorage.getItem('accessToken');
-
-    // Send a request to the Google Apps Script endpoint for getEnrollments
-    fetch('https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec', {
+  // Send a request to the Google Apps Script endpoint for enrollment terms
+  fetch(
+    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    {
       redirect: 'follow',
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'action=getEnrollments' + '&accessToken=' + encodeURIComponent(accessToken) + '&enrollmentTermId=' + encodeURIComponent(enrollmentTermId),
+      body: 'action=terms' + '&accessToken=' + encodeURIComponent(accessToken),
+    }
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      // Handle the returned data (enrollment terms) here
+      console.log(data);
+      // Update your HTML with the received data
+      displayTerms(data);
     })
-      .then((response) => response.json())
-      .then((data) => {
-        // Handle the returned data (enrollments) here
-        console.log('Enrollments:', data);
+    .catch((error) => {
+      console.error('Error fetching enrollment terms:', error);
+      // Handle error appropriately
 
-        // Update your HTML or perform further actions as needed
-        displayCourses(data, enrollmentTermId); // Pass enrollmentTermId to displayCourses
-      })
-      .catch((error) => {
-        console.error('Error fetching enrollments:', error);
-        // Handle error appropriately
+      // Re-enable the 'Next' button if there's an error
+      resetNextButton();
+    });
+}
 
-        // Re-enable the 'Next' button if there's an error
-        nextButton.classList.remove('loading', 'blue');
-        nextButton.innerHTML = 'Next';
-        nextButton.disabled = false;
-      });
+function displayTerms(terms) {
+  // Get the container element to replace its content
+  var processContainer = document.getElementById('process-container');
+
+  // Clear existing content
+  while (processContainer.firstChild) {
+    processContainer.removeChild(processContainer.firstChild);
   }
 
-  function displayCourses(courses, enrollmentTermId) {
-    // Get the container element to replace its content
-    var processContainer = document.getElementById('process-container');
+  // Add a header for the "Select Term" section
+  var header = document.createElement('h2');
+  header.textContent = 'Select Term';
+  processContainer.appendChild(header);
 
-    // Clear existing content
-    processContainer.innerHTML = '';
+  // Instructions for Selecting Term
+  var instructions = document.createElement('p');
+  instructions.innerHTML = "Please select the term for the courses you'd like to merge:";
+  processContainer.appendChild(instructions);
 
-    // Add a header for the "Select Courses" section
-    var header = document.createElement('h2');
-    header.textContent = 'Select Courses';
-    processContainer.appendChild(header);
+  // Create a form element to hold the radio buttons
+  var form = document.createElement('form');
 
-    // Check if there are no courses
-    if (courses.length === 0) {
-      var noCoursesMessage = document.createElement('p');
-      noCoursesMessage.className = 'reminder selection'; // Use the .reminder.selection class
-      noCoursesMessage.innerHTML = 'No Teacher assignments found for the selected term.';
-      processContainer.appendChild(noCoursesMessage);
+  // Iterate through the terms and create a radio button for each
+  terms.forEach((term) => {
+    var label = document.createElement('label');
+    label.innerHTML =
+      '<input type="radio" name="term" value="' +
+      term.id +
+      '"> ' +
+      term.name;
+    form.appendChild(label);
+    form.appendChild(document.createElement('br'));
+  });
 
-      // Create a button for previous step
-      var previousButton = document.createElement('button');
-      previousButton.className = 'buttonmain';
-      previousButton.innerHTML = 'Previous';
-      previousButton.onclick = function () {
-        // Call the function for previous step
-        terms();
-      };
-      // Add previous button to the process container
-      processContainer.appendChild(previousButton);
+  // Create a button to proceed to the next step
+  var nextButton = document.createElement('button');
+  nextButton.className = 'buttonmain';
+  nextButton.innerHTML = 'Next';
+  nextButton.onclick = function () {
+    // Get the selected term ID
+    var selectedTermId;
+    var radioButtons = form.elements['term'];
+    for (var i = 0; i < radioButtons.length; i++) {
+      if (radioButtons[i].checked) {
+        selectedTermId = radioButtons[i].value;
+        break;
+      }
+    }
 
+    // Clear the message if it was displayed before
+    var selectionMessage = processContainer.querySelector('.reminder.selection');
+    if (selectionMessage) {
+      processContainer.removeChild(selectionMessage);
+    }
+
+    if (!selectedTermId) {
+      // Display a message in the div
+      var selectionMessage = document.createElement('p');
+      selectionMessage.classList.add('reminder', 'selection');
+      selectionMessage.innerHTML =
+        'Please make a selection before continuing.';
+      processContainer.appendChild(selectionMessage);
+
+      // Set the flag to true so that the message is not displayed again
+      termSelectionMessageDisplayed = true;
+
+      // Re-enable the 'Next' button
+      resetNextButton();
       return;
     }
 
-    // Add instructions for selecting courses
-    var instructions = document.createElement('p');
-    instructions.textContent = 'Please select at least two courses you want to merge.';
-    processContainer.appendChild(instructions);
+    // Reset the flag when 'Next' button is clicked
+    termSelectionMessageDisplayed = false;
 
-    // Create a form element to hold the checkboxes
-    var form = document.createElement('form');
+    // Perform the next step based on the selected term ID (e.g., show courses)
+    // ...
 
-    // Create a grid to display courses with checkboxes
-    var gridContainer = document.createElement('div');
-    gridContainer.className = 'grid-container';
+    // For demonstration purposes, log the selected term ID
+    console.log('Selected Term ID:', selectedTermId);
 
-    // Declare an array to store selected courses
-    var selectedCourses = [];
+    // Trigger the getEnrollments action with the selected term ID
+    getEnrollments(selectedTermId);
+  };
 
-    // Iterate through the courses and create a checkbox for each
-    courses.forEach((course) => {
-      var checkboxLabel = document.createElement('label');
-      checkboxLabel.innerHTML = `
-    <input type="checkbox" name="course" value='${JSON.stringify(course)}'>
-    <span>${course.courseName} | SIS ID: ${course.sisCourseId}</span>
-  `;
-      gridContainer.appendChild(checkboxLabel);
+  // Add the form and next button to the process container
+  processContainer.appendChild(form);
+  processContainer.appendChild(nextButton);
+}
 
-      // Add an event listener to the checkbox
-      checkboxLabel.querySelector('input').addEventListener('change', function () {
+// Assume resetNextButton function resets the 'Next' button state
+function resetNextButton() {
+  var nextButton = document.querySelector('.buttonmain');
+  nextButton.classList.remove('loading', 'blue');
+  nextButton.innerHTML = 'Next';
+  nextButton.disabled = false;
+}
+
+function getEnrollments(enrollmentTermId) {
+  // Disable the 'Next' button while loading
+  var nextButton = document.querySelector('.buttonmain');
+  nextButton.classList.add('loading', 'blue');
+  nextButton.innerHTML = 'Loading';
+  nextButton.disabled = true;
+
+  // Retrieve access token from sessionStorage
+  var accessToken = sessionStorage.getItem('accessToken');
+
+  // Send a request to the Google Apps Script endpoint for getEnrollments
+  fetch(
+    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    {
+      redirect: 'follow',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body:
+        'action=getEnrollments' +
+        '&accessToken=' +
+        encodeURIComponent(accessToken) +
+        '&enrollmentTermId=' +
+        encodeURIComponent(enrollmentTermId),
+    }
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      // Handle the returned data (enrollments) here
+      console.log('Enrollments:', data);
+
+      // Update your HTML or perform further actions as needed
+      displayCourses(data, enrollmentTermId); // Pass enrollmentTermId to displayCourses
+    })
+    .catch((error) => {
+      console.error('Error fetching enrollments:', error);
+      // Handle error appropriately
+
+      // Re-enable the 'Next' button if there's an error
+      nextButton.classList.remove('loading', 'blue');
+      nextButton.innerHTML = 'Next';
+      nextButton.disabled = false;
+    });
+}
+
+function displayCourses(courses, enrollmentTermId) {
+  // Get the container element to replace its content
+  var processContainer = document.getElementById('process-container');
+
+  // Clear existing content
+  processContainer.innerHTML = '';
+
+  // Add a header for the "Select Courses" section
+  var header = document.createElement('h2');
+  header.textContent = 'Select Courses';
+  processContainer.appendChild(header);
+
+  // Check if there are no courses
+  if (courses.length === 0) {
+    var noCoursesMessage = document.createElement('p');
+    noCoursesMessage.className = 'reminder selection'; // Use the .reminder.selection class
+    noCoursesMessage.innerHTML =
+      'No Teacher assignments found for the selected term.';
+    processContainer.appendChild(noCoursesMessage);
+
+    // Create a button for previous step
+    var previousButton = document.createElement('button');
+    previousButton.className = 'buttonmain';
+    previousButton.innerHTML = 'Previous';
+    previousButton.onclick = function () {
+      // Call the function for previous step
+      terms();
+    };
+    // Add previous button to the process container
+    processContainer.appendChild(previousButton);
+
+    return;
+  }
+
+  // Add instructions for selecting courses
+  var instructions = document.createElement('p');
+  instructions.textContent =
+    'Please select at least two courses you want to merge.';
+  processContainer.appendChild(instructions);
+
+  // Create a form element to hold the checkboxes
+  var form = document.createElement('form');
+
+  // Create a grid to display courses with checkboxes
+  var gridContainer = document.createElement('div');
+  gridContainer.className = 'grid-container';
+
+  // Declare an array to store selected courses
+  var selectedCourses = [];
+
+  // Iterate through the courses and create a checkbox for each
+  courses.forEach((course) => {
+    var checkboxLabel = document.createElement('label');
+    checkboxLabel.innerHTML = `
+      <input type="checkbox" name="course" value='${JSON.stringify(
+        course
+      )}'>
+      <span>${course.courseName} | SIS ID: ${
+      course.sisCourseId
+    }</span>
+    `;
+    gridContainer.appendChild(checkboxLabel);
+
+    // Add an event listener to the checkbox
+    checkboxLabel
+      .querySelector('input')
+      .addEventListener('change', function () {
         // Update the selectedCourses array based on checkbox changes
         if (this.checked) {
           selectedCourses.push(course);
         } else {
           // Remove the course from the array if unchecked
-          selectedCourses = selectedCourses.filter((selectedCourse) => selectedCourse !== course);
+          selectedCourses = selectedCourses.filter(
+            (selectedCourse) => selectedCourse !== course
+          );
         }
       });
-    });
+  });
 
-    // Create a button for previous step
-    var previousButton = document.createElement('button');
-    previousButton.className = 'buttonmain';
-    previousButton.style.cssFloat = 'left'; // Align to the left
-    previousButton.innerHTML = 'Previous';
-    previousButton.onclick = function () {
-      // Call the function for previous step
-      terms();
-    };
+  // Create a button for previous step
+  var previousButton = document.createElement('button');
+  previousButton.className = 'buttonmain';
+  previousButton.style.cssFloat = 'left'; // Align to the left
+  previousButton.innerHTML = 'Previous';
+  previousButton.onclick = function () {
+    // Call the function for previous step
+    terms();
+  };
 
-    // Create a button to proceed to the next step
-    var nextButton = document.createElement('button');
-    nextButton.className = 'buttonmain'; // Use the .buttonmain class
-    nextButton.style.cssFloat = 'right'; // Align to the right
-    nextButton.innerHTML = 'Next';
-    nextButton.onclick = function () {
+  // Create a button to proceed to the next step
+  var nextButton = document.createElement('button');
+  nextButton.className = 'buttonmain'; // Use the .buttonmain class
+  nextButton.style.cssFloat = 'right'; // Align to the right
+  nextButton.innerHTML = 'Next';
+  nextButton.onclick = function () {
+    // Clear existing selection messages
+    clearSelectionMessages();
+
+    // Check the number of selected courses
+    if (selectedCourses.length < 2) {
+      // Display a message if less than 2 courses are selected
+      var selectionMessage = document.createElement('p');
+      selectionMessage.className = 'reminder selection';
+      selectionMessage.innerHTML =
+        'Please select at least two courses before continuing.';
+
+      // Add the new message
+      processContainer.appendChild(selectionMessage);
+    } else {
+      // Proceed to the next step and pass the selected courses
+      displayParentCourseDetails(selectedCourses, enrollmentTermId);
+    }
+  };
+
+  // Add the grid and next button to the process container
+  form.appendChild(gridContainer);
+  processContainer.appendChild(form);
+  processContainer.appendChild(previousButton);
+  processContainer.appendChild(nextButton);
+}
+
+// Function to clear existing selection messages
+function clearSelectionMessages() {
+  var existingMessages = document.querySelectorAll('.reminder.selection');
+  existingMessages.forEach((message) => message.remove());
+}
+
+function displayParentCourseDetails(selectedCourses, enrollmentTermId) {
+  // Get the container element to replace its content
+  var processContainer = document.getElementById('process-container');
+
+  // Clear existing content
+  processContainer.innerHTML = '';
+
+  // Add a header for the "Parent Course Details" section
+  var header = document.createElement('h2');
+  header.textContent = 'Parent Course Details';
+  processContainer.appendChild(header);
+
+  // Add instructions for giving the parent course a name
+  var nameLabel = document.createElement('p');
+  nameLabel.textContent = 'Please give the parent course a name:';
+  processContainer.appendChild(nameLabel);
+
+  // Create a stylized text box for the parent course name
+  var nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.className = 'textinput'; // Add a class for styling
+  processContainer.appendChild(nameInput);
+
+  // Add instructions for the list of selected courses
+  var coursesLabel = document.createElement('p');
+  coursesLabel.textContent =
+    'These selected courses will be merged into the parent course:';
+  processContainer.appendChild(coursesLabel);
+
+  // Create a list to display the selected courses
+  var coursesList = document.createElement('ul');
+  coursesList.className = 'selected-courses-list';
+
+  // Iterate through the selected courses and create list items
+  selectedCourses.forEach((course) => {
+    var listItem = document.createElement('li');
+    listItem.textContent = `${course.courseName} | SIS ID: ${course.sisCourseId}`;
+    coursesList.appendChild(listItem);
+  });
+
+  // Add the list of selected courses to the process container
+  processContainer.appendChild(coursesList);
+
+  // Create a button for previous step
+  var previousButton = document.createElement('button');
+  previousButton.className = 'buttonmain';
+  previousButton.style.cssFloat = 'left'; // Align to the left
+  previousButton.innerHTML = 'Previous';
+  previousButton.onclick = function () {
+    // Call the function for previous step with enrollmentTermId
+    getEnrollments(enrollmentTermId); // Pass enrollmentTermId back
+  };
+
+  // Create a button to proceed to the next step
+  var nextButton = document.createElement('button');
+  nextButton.className = 'buttonmain'; // Use the .buttonmain class
+  nextButton.style.cssFloat = 'right'; // Align to the right
+  nextButton.textContent = 'Next'; // Changed 'Merge' to 'Next' as requested
+  nextButton.onclick = function () {
+    // Check if the parent course name input is empty
+    var parentCourseName = nameInput.value.trim();
+    if (parentCourseName === '') {
       // Clear existing selection messages
       clearSelectionMessages();
 
-      // Check the number of selected courses
-      if (selectedCourses.length < 2) {
-        // Display a message if less than 2 courses are selected
-        var selectionMessage = document.createElement('p');
-        selectionMessage.className = 'reminder selection';
-        selectionMessage.innerHTML = 'Please select at least two courses before continuing.';
-
-        // Add the new message
-        processContainer.appendChild(selectionMessage);
-      } else {
-        // Proceed to the next step and pass the selected courses
-        displayParentCourseDetails(selectedCourses, enrollmentTermId);
-      }
-    };
-
-    // Add the grid and next button to the process container
-    form.appendChild(gridContainer);
-    processContainer.appendChild(form);
-    processContainer.appendChild(previousButton);
-    processContainer.appendChild(nextButton);
-  }
-
-
-
-  // Function to clear existing selection messages
-  function clearSelectionMessages() {
-    var existingMessages = document.querySelectorAll('.reminder.selection');
-    existingMessages.forEach(message => message.remove());
-  }
-
-
-
-  function displayParentCourseDetails(selectedCourses, enrollmentTermId) {
-    // Get the container element to replace its content
-    var processContainer = document.getElementById('process-container');
-
-    // Clear existing content
-    processContainer.innerHTML = '';
-
-    // Add a header for the "Parent Course Details" section
-    var header = document.createElement('h2');
-    header.textContent = 'Parent Course Details';
-    processContainer.appendChild(header);
-
-    // Add instructions for giving the parent course a name
-    var nameLabel = document.createElement('p');
-    nameLabel.textContent = 'Please give the parent course a name:';
-    processContainer.appendChild(nameLabel);
-
-    // Create a stylized text box for the parent course name
-    var nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.className = 'textinput'; // Add a class for styling
-    processContainer.appendChild(nameInput);
-
-    // Add instructions for the list of selected courses
-    var coursesLabel = document.createElement('p');
-    coursesLabel.textContent = 'These selected courses will be merged into the parent course:';
-    processContainer.appendChild(coursesLabel);
-
-    // Create a list to display the selected courses
-    var coursesList = document.createElement('ul');
-    coursesList.className = 'selected-courses-list';
-
-    // Iterate through the selected courses and create list items
-    selectedCourses.forEach((course) => {
-      var listItem = document.createElement('li');
-      listItem.textContent = `${course.courseName} | SIS ID: ${course.sisCourseId}`;
-      coursesList.appendChild(listItem);
-    });
-
-    // Add the list of selected courses to the process container
-    processContainer.appendChild(coursesList);
-
-    // Create a button for previous step
-    var previousButton = document.createElement('button');
-    previousButton.className = 'buttonmain';
-    previousButton.style.cssFloat = 'left'; // Align to the left
-    previousButton.innerHTML = 'Previous';
-    previousButton.onclick = function () {
-      // Call the function for previous step with enrollmentTermId
-      getEnrollments(enrollmentTermId);
-    };
-
-    // Create a button to proceed to the next step
-    var nextButton = document.createElement('button');
-    nextButton.className = 'buttonmain'; // Use the .buttonmain class
-    nextButton.style.cssFloat = 'right'; // Align to the right
-    nextButton.textContent = 'Next'; // Changed 'Merge' to 'Next' as requested
-    nextButton.onclick = function () {
-      // Check if the parent course name input is empty
-      var parentCourseName = nameInput.value.trim();
-      if (parentCourseName === '') {
-        // Clear existing selection messages
-        clearSelectionMessages();
-
-        // Display a message under the next button
-        var selectionMessage = document.createElement('p');
-        selectionMessage.className = 'reminder selection';
-        selectionMessage.textContent = 'Please give the parent course a name.';
-        processContainer.appendChild(selectionMessage);
-        return; // Stop the function from proceeding further
-      }
-
-      // If there's a value, clear any existing warning message
-      clearSelectionMessages();
-
-      // Proceed to the next step with the provided parent course name and selected courses
-      displayConfirmationScreen(parentCourseName, selectedCourses, enrollmentTermId);
-      // Here you might want to call the function that handles the next step of the process
-      console.log('Parent Course Name:', parentCourseName);
-      console.log('Selected Courses:', selectedCourses);
-      // Example: Call a function to show confirmation screen
-      // showConfirmationScreen(parentCourseName, selectedCourses);
-    };
-
-    // Add the next button to the process container
-    processContainer.appendChild(previousButton);
-    processContainer.appendChild(nextButton);
-  }
-
-  // Function to clear existing selection messages
-  function clearSelectionMessages() {
-    var existingMessages = document.querySelectorAll('.reminder.selection');
-    existingMessages.forEach((message) => message.remove());
-  }
-
-
-  function displayConfirmationScreen(parentCourseName, selectedCourses, enrollmentTermId) {
-    var processContainer = document.getElementById('process-container');
-    processContainer.innerHTML = '';
-
-    var header = document.createElement('h2');
-    header.textContent = 'Confirmation';
-    processContainer.appendChild(header);
-
-    var parentCourseLabel = document.createElement('p');
-    parentCourseLabel.textContent = 'Parent Course Name: ' + parentCourseName;
-    processContainer.appendChild(parentCourseLabel);
-
-    var coursesLabel = document.createElement('p');
-    coursesLabel.textContent = 'Selected Courses:';
-    processContainer.appendChild(coursesLabel);
-
-    var coursesList = document.createElement('ul');
-    selectedCourses.forEach((course) => {
-      var listItem = document.createElement('li');
-      listItem.textContent = `${course.courseName} | SIS ID: ${course.sisCourseId}`;
-      coursesList.appendChild(listItem);
-    });
-    processContainer.appendChild(coursesList);
-
-    // Create a button for previous step
-    var previousButton = document.createElement('button');
-    previousButton.className = 'buttonmain';
-    previousButton.style.cssFloat = 'left'; // Align to the left
-    previousButton.innerHTML = 'Previous';
-    previousButton.onclick = function () {
-      // Call the function for previous step with enrollmentTermId
-      displayParentCourseDetails(selectedCourses, enrollmentTermId); // Pass enrollmentTermId back
-    };
-
-    var mergeButton = document.createElement('button');
-    mergeButton.className = 'buttonmain merge green';
-    mergeButton.style.cssFloat = 'right'; // Align to the right
-    mergeButton.textContent = 'Merge';
-
-    // Disable the merge button and change its class to reflect loading state on click
-    mergeButton.onclick = function () {
-      mergeButton.disabled = true;
-      mergeButton.classList.add('loading', 'merge');
-      mergeButton.textContent = 'Merging';
-
-      // Call the mergeCourses function to initiate the merge process
-      mergeCourses(parentCourseName, selectedCourses);
-    };
-    processContainer.appendChild(previousButton);
-    processContainer.appendChild(mergeButton);
-  }
-
-
-  function mergeCourses(parentCourseName, selectedCourses) {
-    var userInfoString = sessionStorage.getItem('userInfo');
-
-    // Parse the userInfoString to JSON
-    var userInfoJson;
-    try {
-      // Parse the JSON string twice to convert it into an object
-      userInfoJson = JSON.parse(JSON.parse(userInfoString));
-    } catch (error) {
-      console.error('Error parsing userInfo:', error);
-      return;
+      // Display a message under the next button
+      var selectionMessage = document.createElement('p');
+      selectionMessage.className = 'reminder selection';
+      selectionMessage.textContent =
+        'Please give the parent course a name.';
+      processContainer.appendChild(selectionMessage);
+      return; // Stop the function from proceeding further
     }
 
-    // Access the 'id' property directly
-    if (userInfoJson && userInfoJson.id != null) {
-      var userId = userInfoJson.id;
+    // If there's a value, clear any existing warning message
+    clearSelectionMessages();
 
-      // Get termId and accountId from the first item in selectedCourses
-      var firstCourse = selectedCourses[0];
-      var termId = firstCourse.termId;
-      var accountId = firstCourse.accountId;
+    // Proceed to the next step with the provided parent course name and selected courses
+    displayConfirmationScreen(parentCourseName, selectedCourses, enrollmentTermId);
+    // Here you might want to call the function that handles the next step of the process
+    console.log('Parent Course Name:', parentCourseName);
+    console.log('Selected Courses:', selectedCourses);
+    // Example: Call a function to show confirmation screen
+    // showConfirmationScreen(parentCourseName, selectedCourses);
+  };
 
-      // Construct the payload for the merge action
-      var payload = {
-        action: 'mergeSections',
-        course_name: parentCourseName,
-        course_sections: selectedCourses.map(course => course.courseSectionId),
-        inst_id: userId,
-        accessToken: sessionStorage.getItem('accessToken'),
-        enrollmentTermId: termId,
-        accountId: accountId
-      };
+  // Add the next button to the process container
+  processContainer.appendChild(previousButton);
+  processContainer.appendChild(nextButton);
+}
 
-      console.log('Merge Payload:', payload);
+// Function to clear existing selection messages
+function clearSelectionMessages() {
+  var existingMessages = document.querySelectorAll('.reminder.selection');
+  existingMessages.forEach((message) => message.remove());
+}
 
-      // Convert payload to URL-encoded string
-      var payloadString = Object.keys(payload)
-        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
-        .join('&');
+function displayConfirmationScreen(
+  parentCourseName,
+  selectedCourses,
+  enrollmentTermId
+) {
+  var processContainer = document.getElementById('process-container');
+  processContainer.innerHTML = '';
 
-      // Define the URL for your API endpoint
-      var apiUrl = 'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec';
+  var header = document.createElement('h2');
+  header.textContent = 'Confirmation';
+  processContainer.appendChild(header);
 
-      // Make the POST request using fetch API
-      fetch(apiUrl, {
-        redirect: 'follow',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          // You may need to include additional headers if required by your API
-        },
-        body: payloadString
+  var parentCourseLabel = document.createElement('p');
+  parentCourseLabel.textContent = 'Parent Course Name: ' + parentCourseName;
+  processContainer.appendChild(parentCourseLabel);
+
+  var coursesLabel = document.createElement('p');
+  coursesLabel.textContent = 'Selected Courses:';
+  processContainer.appendChild(coursesLabel);
+
+  var coursesList = document.createElement('ul');
+  selectedCourses.forEach((course) => {
+    var listItem = document.createElement('li');
+    listItem.textContent = `${course.courseName} | SIS ID: ${course.sisCourseId}`;
+    coursesList.appendChild(listItem);
+  });
+  processContainer.appendChild(coursesList);
+
+  // Create a button for previous step
+  var previousButton = document.createElement('button');
+  previousButton.className = 'buttonmain';
+  previousButton.style.cssFloat = 'left'; // Align to the left
+  previousButton.innerHTML = 'Previous';
+  previousButton.onclick = function () {
+    // Call the function for previous step with enrollmentTermId
+    displayParentCourseDetails(selectedCourses, enrollmentTermId); // Pass enrollmentTermId back
+  };
+
+  var mergeButton = document.createElement('button');
+  mergeButton.className = 'buttonmain merge green';
+  mergeButton.style.cssFloat = 'right'; // Align to the right
+  mergeButton.textContent = 'Merge';
+
+  // Disable the merge button and change its class to reflect loading state on click
+  mergeButton.onclick = function () {
+    mergeButton.disabled = true;
+    mergeButton.classList.add('loading', 'merge');
+    mergeButton.textContent = 'Merging';
+
+    // Call the mergeCourses function to initiate the merge process
+    mergeCourses(parentCourseName, selectedCourses);
+  };
+  processContainer.appendChild(previousButton);
+  processContainer.appendChild(mergeButton);
+}
+
+function mergeCourses(parentCourseName, selectedCourses) {
+  var userInfoString = sessionStorage.getItem('userInfo');
+
+  // Parse the userInfoString to JSON
+  var userInfoJson;
+  try {
+    // Parse the JSON string twice to convert it into an object
+    userInfoJson = JSON.parse(JSON.parse(userInfoString));
+  } catch (error) {
+    console.error('Error parsing userInfo:', error);
+    return;
+  }
+
+  // Access the 'id' property directly
+  if (userInfoJson && userInfoJson.id != null) {
+    var userId = userInfoJson.id;
+
+    // Get termId and accountId from the first item in selectedCourses
+    var firstCourse = selectedCourses[0];
+    var termId = firstCourse.termId;
+    var accountId = firstCourse.accountId;
+
+    // Construct the payload for the merge action
+    var payload = {
+      action: 'mergeSections',
+      course_name: parentCourseName,
+      course_sections: selectedCourses.map((course) => course.courseSectionId),
+      inst_id: userId,
+      accessToken: sessionStorage.getItem('accessToken'),
+      enrollmentTermId: termId,
+      accountId: accountId,
+    };
+
+    console.log('Merge Payload:', payload);
+
+    // Convert payload to URL-encoded string
+    var payloadString = Object.keys(payload)
+      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
+      .join('&');
+
+    // Define the URL for your API endpoint
+    var apiUrl =
+      'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec';
+
+    // Make the POST request using fetch API
+    fetch(apiUrl, {
+      redirect: 'follow',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        // You may need to include additional headers if required by your API
+      },
+      body: payloadString,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Handle the response as JSON
       })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json(); // Handle the response as JSON
-        })
-        .then(data => {
-          // Handle the response data here
-          console.log('Response from server:', data);
-          // Call displayMergeSuccess if merge was successful
-          displayMergeSuccess(data);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          // Re-enable the merge button and remove loading state
-          mergeButton.disabled = false;
-          mergeButton.classList.remove('loading', 'merge');
-          mergeButton.textContent = 'Merge';
-        });
-
-    } else {
-      console.error('User ID not found in userInfo');
-    }
+      .then((data) => {
+        // Handle the response data here
+        console.log('Response from server:', data);
+        // Call displayMergeSuccess if merge was successful
+        displayMergeSuccess(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // Re-enable the merge button and remove loading state
+        mergeButton.disabled = false;
+        mergeButton.classList.remove('loading', 'merge');
+        mergeButton.textContent = 'Merge';
+      });
+  } else {
+    console.error('User ID not found in userInfo');
   }
+}
 
-  function displayMergeSuccess(responseFromServer) {
-    var processContainer = document.getElementById('process-container');
-    processContainer.innerHTML = '';
+function displayMergeSuccess(responseFromServer) {
+  var processContainer = document.getElementById('process-container');
+  processContainer.innerHTML = '';
 
+  // Create a button for previous step
+  var startOverButton = document.createElement('button');
+  startOverButton.className = 'buttonmain';
+  startOverButton.style.cssFloat = 'center'; // Align to the center
+  startOverButton.innerHTML = 'Start Over';
+  startOverButton.onclick = function () {
+    // Call the function for previous step
+    terms();
+  };
+  // Add previous button to the process container
 
-    // Create a button for previous step
-    var startOverButton = document.createElement('button');
-    startOverButton.className = 'buttonmain';
-    startOverButton.style.cssFloat = 'center'; // Align to the center
-    startOverButton.innerHTML = 'Start Over';
-    startOverButton.onclick = function () {
-      // Call the function for previous step
-      terms();
-    };
-    // Add previous button to the process container
+  var header = document.createElement('h2');
+  header.textContent = 'Merge Successful';
+  processContainer.appendChild(header);
 
+  var parentCourseLabel = document.createElement('p');
+  parentCourseLabel.textContent =
+    'Parent Course Name: ' + responseFromServer.name;
+  processContainer.appendChild(parentCourseLabel);
 
-    var header = document.createElement('h2');
-    header.textContent = 'Merge Successful';
-    processContainer.appendChild(header);
+  var link = document.createElement('a');
+  link.href = responseFromServer.link;
+  link.textContent = 'View New Course';
+  link.target = '_blank'; // Open link in a new tab
+  processContainer.appendChild(link);
 
-    var parentCourseLabel = document.createElement('p');
-    parentCourseLabel.textContent = 'Parent Course Name: ' + responseFromServer.name;
-    processContainer.appendChild(parentCourseLabel);
+  var successMessage = document.createElement('p');
+  successMessage.textContent = 'Course successfully merged!';
+  processContainer.appendChild(successMessage);
+  processContainer.appendChild(startOverButton);
+}
 
-    var link = document.createElement('a');
-    link.href = responseFromServer.link;
-    link.textContent = 'View New Course';
-    link.target = '_blank'; // Open link in a new tab
-    processContainer.appendChild(link);
+function logout() {
+  // Disable the 'Logout' button while loading
+  var logoutButton = document.querySelector('.buttonmain.logout');
+  logoutButton.classList.add('loading', 'logout');
+  logoutButton.innerHTML = 'Logging Out';
+  logoutButton.disabled = true;
 
-    var successMessage = document.createElement('p');
-    successMessage.textContent = 'Course successfully merged!';
-    processContainer.appendChild(successMessage);
-    processContainer.appendChild(startOverButton);
-  }
+  // Retrieve access token from sessionStorage
+  var accessToken = sessionStorage.getItem('accessToken');
 
-
-
-
-  function logout() {
-    // Disable the 'Logout' button while loading
-    var logoutButton = document.querySelector('.buttonmain.logout');
-    logoutButton.classList.add('loading', 'logout');
-    logoutButton.innerHTML = 'Logging Out';
-    logoutButton.disabled = true;
-
-    // Retrieve access token from sessionStorage
-    var accessToken = sessionStorage.getItem('accessToken');
-
-    // Send a request to the Google Apps Script endpoint for logout
-    fetch('https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec', {
+  // Send a request to the Google Apps Script endpoint for logout
+  fetch(
+    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    {
       redirect: 'follow',
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'action=logout' + '&accessToken=' + encodeURIComponent(accessToken),
-    })
-      .then((response) => response.text()) // Get the text content from the response
-      .then((message) => {
-        console.log('Logout response:', message);
+    }
+  )
+    .then((response) => response.text()) // Get the text content from the response
+    .then((message) => {
+      console.log('Logout response:', message);
 
-        // Check the response message and update the UI accordingly
-        if (message === 'Logout successful') {
-          // Clear the content of the screen except for the authorize button
-          var contentDiv = document.getElementById('content');
-          if (contentDiv) {
-            contentDiv.innerHTML =
-              '<h1>VCU Canvas Course Merging Tool</h1><p>Logout successful</p><button class="buttonmain" onclick="authorize()">Authorize Canvas Login</button>';
-          } else {
-            console.error('Content div not found');
-          }
+      // Check the response message and update the UI accordingly
+      if (message === 'Logout successful') {
+        // Clear the content of the screen except for the authorize button
+        var contentDiv = document.getElementById('content');
+        if (contentDiv) {
+          contentDiv.innerHTML =
+            '<h1>VCU Canvas Course Merging Tool</h1><p>Logout successful</p><button class="buttonmain" onclick="authorize()">Authorize Canvas Login</button>';
         } else {
-          console.error('Logout failed');
+          console.error('Content div not found');
         }
-      })
-      .catch((error) => {
-        console.error('Logout error:', error);
-      })
-      .finally(() => {
-        // Re-enable the 'Logout' button
-        logoutButton.classList.remove('loading', 'logout');
-        logoutButton.classList.add('buttonmain', 'logout');
-        logoutButton.innerHTML = 'Logout';
-        logoutButton.disabled = false;
-      });
-  }
-
+      } else {
+        console.error('Logout failed');
+      }
+    })
+    .catch((error) => {
+      console.error('Logout error:', error);
+    })
+    .finally(() => {
+      // Re-enable the 'Logout' button
+      logoutButton.classList.remove('loading', 'logout');
+      logoutButton.classList.add('buttonmain', 'logout');
+      logoutButton.innerHTML = 'Logout';
+      logoutButton.disabled = false;
+    });
+}
