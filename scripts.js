@@ -37,7 +37,7 @@ function authorize() {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'action=exchangeCode&code=' + code 
+        body: 'action=exchangeCode&accessToken=NULL&code=' + code 
       })
       .then(response => response.json())
       .then(data => {
