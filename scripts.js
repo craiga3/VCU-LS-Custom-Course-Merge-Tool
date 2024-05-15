@@ -2,17 +2,26 @@
 var termSelectionMessageDisplayed = false;
 
 function authorize() {
-    // Fetch the authorization URL from your Apps Script
-    fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec') 
-      .then(response => response.json())
-      .then(data => {
-        var authorizationUrl = data.authorizationUrl;
+    // Send a POST request to your Apps Script endpoint
+    fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'action=login' 
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.authorizationUrl) {
         // Open the authorization URL in a new window/tab
-        window.open(authorizationUrl, '_blank'); 
-      })
-      .catch(error => {
-        console.error('Error fetching authorization URL:', error); 
-      });
+        window.open(data.authorizationUrl, '_blank'); 
+      } else {
+        console.error("Error during login:", data.error); // Log the error
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching authorization URL:', error); 
+    });
   }
 
 function terms() {
