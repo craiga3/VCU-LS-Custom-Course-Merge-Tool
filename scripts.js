@@ -2,12 +2,18 @@
 var termSelectionMessageDisplayed = false;
 
 function authorize() {
-  // Authorization URL is included in the initial HTML response
-  var authorizationUrl = '<?= authorizationUrl ?>';
-
-  // Open the authorization URL in a new window/tab
-  window.open(authorizationUrl, '_blank');
-}
+    // Fetch the authorization URL from your Apps Script
+    fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec') 
+      .then(response => response.json())
+      .then(data => {
+        var authorizationUrl = data.authorizationUrl;
+        // Open the authorization URL in a new window/tab
+        window.open(authorizationUrl, '_blank'); 
+      })
+      .catch(error => {
+        console.error('Error fetching authorization URL:', error); 
+      });
+  }
 
 function terms() {
   // Disable the 'Next' button while loading
@@ -24,7 +30,7 @@ function terms() {
 
   // Send a request to the Google Apps Script endpoint for enrollment terms
   fetch(
-    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    'https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec',
     {
       redirect: 'follow',
       method: 'POST',
@@ -159,7 +165,7 @@ function getEnrollments(enrollmentTermId) {
 
   // Send a request to the Google Apps Script endpoint for getEnrollments
   fetch(
-    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    'https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec',
     {
       redirect: 'follow',
       method: 'POST',
@@ -515,7 +521,7 @@ function mergeCourses(parentCourseName, selectedCourses) {
 
     // Define the URL for your API endpoint
     var apiUrl =
-      'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec';
+      'https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec';
 
     // Make the POST request using fetch API
     fetch(apiUrl, {
@@ -599,7 +605,7 @@ function logout() {
 
   // Send a request to the Google Apps Script endpoint for logout
   fetch(
-    'https://script.google.com/macros/s/AKfycbzVjW7pUwsUx0EwD-zzz01lY60MIxyAuJUwJanOJfOQsv1piT1zpKhvljUoy7jEk0DjKQ/exec',
+    'https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec',
     {
       redirect: 'follow',
       method: 'POST',
