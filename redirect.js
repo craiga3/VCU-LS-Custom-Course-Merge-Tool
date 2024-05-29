@@ -36,6 +36,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Store the access token in session storage
         sessionStorage.setItem('accessToken', responseData.accessToken);
 
+        // Send request to get User Profile
+        const userPayload = new URLSearchParams();
+        userPayload.append('action', 'getUserInfo');
+        userPayload.append('accessToken', responseData.accessToken); 
+
+        const userResponse = await fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: userPayload
+        });
+
+        if (!userResponse.ok) {
+            throw new Error(`Error fetching user info: ${userResponse.statusText}`);
+        }
+
+        const userData = await userResponse.json();
+
+        // Store the user info in session storage
+        sessionStorage.setItem('userInfo', JSON.stringify(userData));
+
         // Redirect back to the main page
         window.location.href = 'https://craiga3.github.io/VCU-LS-Custom-Course-Merge-Tool/';
     } catch (error) {

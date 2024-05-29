@@ -41,12 +41,6 @@
 
       <button class="buttonmain logout" onclick="logout()">Logout</button>
 
-      <!-- Save access token, authorization URL, and user info to sessionStorage -->
-      <script>
-        sessionStorage.setItem('accessToken', '<?= accessToken ?>');
-        sessionStorage.setItem('authorizationUrl', '<?= authorizationUrl ?>');
-        sessionStorage.setItem('userInfo', JSON.stringify(<?= JSON.stringify(userInfo) ?>));
-      </script>
     <? } else { ?>
       <h1>VCU Canvas Course Merging Tool</h1>
       <button class="buttonmain" onclick="authorize()">Authorize Canvas Login</button>
