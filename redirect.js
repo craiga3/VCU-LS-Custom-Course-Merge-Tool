@@ -1,46 +1,42 @@
-// Function to handle the redirect after authorization
-function handleRedirect() {
-    // Get the 'code' query parameter from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-  
-    if (code) {
-      // Send the code to your Apps Script backend to exchange for an access token
-      fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=exchangeCode&code=' + code
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.accessToken) {
-          // Store the access token in sessionStorage
-          sessionStorage.setItem('accessToken', data.accessToken);
-  
-          // Redirect to the main application page, including the access token in the URL
-          window.location.replace('https://craiga3.github.io/?accessToken=' + data.accessToken); 
-        } else {
-          console.error("Error exchanging code for access token:", data.error);
-          displayErrorMessage("Error exchanging code for access token.");
-        }
-      })
-      .catch(error => {
-        console.error('Error exchanging code for access token:', error);
-        displayErrorMessage("Error exchanging code for access token.");
-      });
-    } else {
-      displayErrorMessage("Authorization code not found.");
+document.addEventListener("DOMContentLoaded", async () => {
+    // Extract the authorization code from the URL
+    const params = new URLSearchParams(window.location.search);
+    const authorizationCode = params.get('code');
+
+    if (!authorizationCode) {
+        console.error('No authorization code found.');
+        return;
     }
-  }
-  
-  // Function to display an error message
-  function displayErrorMessage(message) {
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = `<h1>Error</h1><p>${message}</p>`;
-  }
-  
-  // Call the handleRedirect function on page load
-  window.onload = handleRedirect;
-  
+
+    try {
+        // Prepare the payload
+        const payload = {
+            action: 'exchangeCode',
+            code: authorizationCode,
+            accessToken: null  // Include null accessToken
+        };
+
+        // Send a POST request to the Google Apps Script endpoint
+        const response = await fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error exchanging code: ${response.statusText}`);
+        }
+
+        const responseData = await response.json();
+
+        // Handle the response from Google Apps Script
+        console.log('Response from Google Apps Script:', responseData);
+
+        // Redirect back to the main page
+        window.location.href = 'https://craiga3.github.io/VCU-LS-Custom-Course-Merge-Tool/';
+    } catch (error) {
+        console.error('Error during code exchange:', error);
+    }
+});
