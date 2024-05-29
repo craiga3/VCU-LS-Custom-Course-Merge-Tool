@@ -11,10 +11,10 @@
   <div class="body-content" id="content">
     <? if (typeof userInfo !== 'undefined') { ?>
       <h1>VCU Canvas Course Merging Tool</h1>
-      <div class="user-info">
-        <p>Name: <?= userInfo.name ?></p>
+      <div class="user-info" id="user-info">
+        <p>Name: <span id="user-name"></span></p>
         <span class="pipe">|</span>
-        <p>Email: <?= userInfo.primary_email ?></p>
+        <p>Email: <span id="user-email"></span></p>
       </div>
 
       <div class="processcontainer" id="process-container">
@@ -40,6 +40,15 @@
       </div>
 
       <button class="buttonmain logout" onclick="logout()">Logout</button>
+
+      <script>
+        // Get user info from session storage
+        var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+
+        // Populate name and email fields
+        document.getElementById('user-name').textContent = userInfo.name;
+        document.getElementById('user-email').textContent = userInfo.primary_email;
+      </script>
 
     <? } else { ?>
       <h1>VCU Canvas Course Merging Tool</h1>
