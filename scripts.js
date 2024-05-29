@@ -2,30 +2,27 @@
 var termSelectionMessageDisplayed = false;
 
 function authorize() {
-  // Send a POST request to your Apps Script endpoint for code exchange
-  fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+    // Send a POST request to your Apps Script endpoint for login
+    fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'action=exchangeCode&accessToken=NULL&code=NULL' // Pass NULL for code and accessToken
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.accessToken) {
-          // Store the access token in sessionStorage
-          sessionStorage.setItem('accessToken', data.accessToken);
-
-          // Redirect to the main application page, INCLUDING the access token in the URL
-          window.location.replace('https://craiga3.github.io/VCU-LS-Custom-Course-Merge-Tool/?accessToken=' + data.accessToken); 
+      body: 'action=login&accessToken=NULL' 
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.authorizationUrl) {
+        // Open the authorization URL in a new window/tab
+        window.open(data.authorizationUrl, '_blank'); 
       } else {
-          console.error("Error exchanging code for access token:", data.error);
+        console.error("Error during login:", data.error); // Log the error
       }
-  })
-  .catch(error => {
-      console.error('Error exchanging code for access token:', error);
-  });
-}
+    })
+    .catch(error => {
+      console.error('Error fetching authorization URL:', error); 
+    });
+  }
 
 
 function terms() {
