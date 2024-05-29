@@ -490,13 +490,13 @@ function displayConfirmationScreen(
 }
 
 function mergeCourses(parentCourseName, selectedCourses) {
+  // Get the userInfo from session storage
   var userInfoString = sessionStorage.getItem('userInfo');
 
-  // Parse the userInfoString to JSON
+  // Parse the userInfoString to JSON (it's likely already a JSON string, so no need for double parsing)
   var userInfoJson;
   try {
-    // Parse the JSON string twice to convert it into an object
-    userInfoJson = JSON.parse(JSON.parse(userInfoString));
+    userInfoJson = JSON.parse(userInfoString);
   } catch (error) {
     console.error('Error parsing userInfo:', error);
     return;
@@ -566,6 +566,7 @@ function mergeCourses(parentCourseName, selectedCourses) {
     console.error('User ID not found in userInfo');
   }
 }
+
 
 function displayMergeSuccess(responseFromServer) {
   var processContainer = document.getElementById('process-container');
