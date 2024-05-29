@@ -65,6 +65,12 @@
     if (!accessToken) {
       document.getElementById('process-container').style.display = 'none';
     }
+
+    // Hide the user info and logout button if the access token is not available
+    if (!accessToken) {
+      document.getElementById('user-info').style.display = 'none';
+      document.querySelector('.logout').style.display = 'none';
+    }
   </script>
 </body>
 </html>
