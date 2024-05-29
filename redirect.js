@@ -33,6 +33,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Handle the response from Google Apps Script
         console.log('Response from Google Apps Script:', responseData);
 
+        // Store the access token in session storage
+        sessionStorage.setItem('accessToken', responseData.accessToken);
+
         // Redirect back to the main page
         window.location.href = 'https://craiga3.github.io/VCU-LS-Custom-Course-Merge-Tool/';
     } catch (error) {
