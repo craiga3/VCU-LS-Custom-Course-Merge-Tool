@@ -9,65 +9,61 @@
 
 <body>
   <div class="body-content" id="content">
-    <? if (typeof userInfo !== 'undefined') { ?>
-      <h1>VCU Canvas Course Merging Tool</h1>
-      <div class="user-info" id="user-info">
-        <p>Name: <span id="user-name"></span></p>
-        <span class="pipe">|</span>
-        <p>Email: <span id="user-email"></span></p>
-      </div>
+    <h1>VCU Canvas Course Merging Tool</h1>
+    <div class="user-info" id="user-info">
+      <p>Name: <span id="user-name"></span></p>
+      <span class="pipe">|</span>
+      <p>Email: <span id="user-email"></span></p>
+    </div>
 
-      <div class="processcontainer" id="process-container">
-        <!-- Content to be updated dynamically based on steps -->
-        <h2>How to use this tool</h2>
-        <h4>Please read these instructions fully and carefully.</h4>
-        <p>Follow these steps to merge courses:</p>
-        <ol type="1">
-          <li>Click "Next" below to select the term for the courses you want to merge.</li>
-          <li>Choose the desired term and click "Next" to proceed.</li>
-          <li>You will see a list of courses where you are assigned as the instructor.</li>
-          <li>Select the courses you want to merge into a parent course.</li>
-          <li>Provide a name for the parent course.</li>
-          <li>Click "Merge" to complete the process.</li>
-        </ol>
-        <p>Make sure to review your selections before clicking "Merge."</p>
-        <p class="reminder">
-          <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected course(s).<br>If
-          you are not the instructor in a course that needs to be merged, please ask the instructor to invite you to the
-          course before completing this process.
-        </p>
-        <button class="buttonmain" onclick="terms()">Next</button>
-      </div>
+    <div class="processcontainer" id="process-container">
+      <!-- Content to be updated dynamically based on steps -->
+      <h2>How to use this tool</h2>
+      <h4>Please read these instructions fully and carefully.</h4>
+      <p>Follow these steps to merge courses:</p>
+      <ol type="1">
+        <li>Click "Next" below to select the term for the courses you want to merge.</li>
+        <li>Choose the desired term and click "Next" to proceed.</li>
+        <li>You will see a list of courses where you are assigned as the instructor.</li>
+        <li>Select the courses you want to merge into a parent course.</li>
+        <li>Provide a name for the parent course.</li>
+        <li>Click "Merge" to complete the process.</li>
+      </ol>
+      <p>Make sure to review your selections before clicking "Merge."</p>
+      <p class="reminder">
+        <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected course(s).<br>If
+        you are not the instructor in a course that needs to be merged, please ask the instructor to invite you to the
+        course before completing this process.
+      </p>
+      <button class="buttonmain" onclick="terms()">Next</button>
+    </div>
 
-      <button class="buttonmain logout" onclick="logout()">Logout</button>
-
-      <script>
-        // Get user info from session storage
-        var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-
-        // Populate name and email fields
-        document.getElementById('user-name').textContent = userInfo.name;
-        document.getElementById('user-email').textContent = userInfo.primary_email;
-      </script>
-
-
+    <button class="buttonmain logout" onclick="logout()">Logout</button>
+    <button class="buttonmain authorize" onclick="authorize()">Authorize Canvas Login</button>
   </div>
 
   <script src="scripts.js"></script> 
   <script>
-    // Check if the access token is available in session storage
-    var accessToken = sessionStorage.getItem('accessToken');
+    document.addEventListener('DOMContentLoaded', function() {
+      var accessToken = sessionStorage.getItem('accessToken');
+      var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 
-    // Hide the process container if the access token is not available
-    if (!accessToken) {
-      document.getElementById('process-container').style.display = 'none';
-    }
+      if (accessToken) {
+        // Populate user info if available
+        if (userInfo) {
+          document.getElementById('user-name').textContent = userInfo.name;
+          document.getElementById('user-email').textContent = userInfo.primary_email;
+        }
 
-    // Hide the user info and logout button if the access token is not available
-    if (!accessToken) {
-      document.getElementById('user-info').style.display = 'none';
-      document.querySelector('.logout').style.display = 'none';
-    }
+        // Hide the authorize button
+        document.querySelector('.authorize').style.display = 'none';
+      } else {
+        // Hide user info, process container, and logout button if not logged in
+        document.getElementById('user-info').style.display = 'none';
+        document.getElementById('process-container').style.display = 'none';
+        document.querySelector('.logout').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
