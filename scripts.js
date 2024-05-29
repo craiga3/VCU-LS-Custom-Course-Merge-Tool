@@ -2,60 +2,63 @@
 var termSelectionMessageDisplayed = false;
 
 function authorize() {
-  // Send a POST request to your Apps Script endpoint for login
-  fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'action=login&accessToken=NULL' 
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.authorizationUrl) {
-      // Open the authorization URL in a new window/tab
-      window.open(data.authorizationUrl, '_blank'); 
-    } else {
-      console.error("Error during login:", data.error); // Log the error
-    }
-  })
-  .catch(error => {
-    console.error('Error fetching authorization URL:', error); 
-  });
-}
-
-// Function to handle the redirect after authorization
-function handleRedirect() {
-  // Get the 'code' query parameter from the URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
-
-  if (code) {
-    // Send the code to your Apps Script backend to exchange for an access token
+    // Send a POST request to your Apps Script endpoint for login
     fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'action=exchangeCode&accessToken=NULL&code=' + code
+      body: 'action=login&accessToken=NULL' 
     })
     .then(response => response.json())
     .then(data => {
-      if (data.accessToken) {
-        // Store the access token in sessionStorage
-        sessionStorage.setItem('accessToken', data.accessToken);
-
-        // Redirect to the main application page, INCLUDING the access token in the URL
-        window.location.replace('https://craiga3.github.io/?accessToken=' + data.accessToken); 
+      if (data.authorizationUrl) {
+        // Open the authorization URL in a new window/tab
+        window.open(data.authorizationUrl, '_blank'); 
       } else {
-        console.error("Error exchanging code for access token:", data.error);
+        console.error("Error during login:", data.error); // Log the error
       }
     })
     .catch(error => {
-      console.error('Error exchanging code for access token:', error);
+      console.error('Error fetching authorization URL:', error); 
     });
-  } 
-}
+  }
+  
+  // Function to handle the redirect after authorization
+  function handleRedirect() {
+    // Get the 'code' query parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+  
+    if (code) {
+      // Send the code to your Apps Script backend to exchange for an access token
+      fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=exchangeCode&accessToken=NULL&code=' + code
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.accessToken) {
+          // Store the access token in sessionStorage
+          sessionStorage.setItem('accessToken', data.accessToken);
+  
+          // Redirect to the main application page, INCLUDING the access token in the URL
+          window.location.replace('https://craiga3.github.io/?accessToken=' + data.accessToken); 
+        } else {
+          console.error("Error exchanging code for access token:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error exchanging code for access token:', error);
+      });
+    } 
+  }
+  
+  // Call the handleRedirect function on page load
+  window.onload = handleRedirect;
 
 function terms() {
   // Disable the 'Next' button while loading
