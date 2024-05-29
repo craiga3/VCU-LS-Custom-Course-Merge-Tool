@@ -631,6 +631,7 @@ function logout() {
 
       // Check the response message and update the UI accordingly
       if (message === 'Logout successful') {
+        sessionStorage.clear();
         // Clear the content of the screen except for the authorize button
         var contentDiv = document.getElementById('content');
         if (contentDiv) {
