@@ -57,5 +57,14 @@
   </div>
 
   <script src="scripts.js"></script> 
+  <script>
+    // Check if the access token is available in session storage
+    var accessToken = sessionStorage.getItem('accessToken');
+
+    // Hide the process container if the access token is not available
+    if (!accessToken) {
+      document.getElementById('process-container').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
