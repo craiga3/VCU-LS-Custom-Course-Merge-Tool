@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Extract the authorization code from the URL
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get('code');
-
+console.log(authorizationCode);
     if (!authorizationCode) {
         console.error('No authorization code found.');
         return;
