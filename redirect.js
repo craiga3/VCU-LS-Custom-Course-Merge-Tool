@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         sessionStorage.setItem('userInfo', JSON.stringify(userData));
 
         // Redirect back to the main page
-        window.location.href = 'https://craiga3.github.io/VCU-LS-Custom-Course-Merge-Tool/';
+        window.location.href = responseData.homeUrl;
     } catch (error) {
         console.error('Error during code exchange:', error);
     }
