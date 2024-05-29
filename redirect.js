@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Extract the authorization code from the URL
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get('code');
-console.log(authorizationCode);
+    console.log(authorizationCode);
     if (!authorizationCode) {
         console.error('No authorization code found.');
         return;
@@ -10,19 +10,18 @@ console.log(authorizationCode);
 
     try {
         // Prepare the payload
-        const payload = {
-            action: 'exchangeCode',
-            code: authorizationCode,
-            accessToken: null  // Include null accessToken
-        };
+        const payload = new URLSearchParams();
+        payload.append('action', 'exchangeCode');
+        payload.append('code', authorizationCode);
+        payload.append('accessToken', '');  // Include an empty accessToken
 
         // Send a POST request to the Google Apps Script endpoint
         const response = await fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify(payload)
+            body: payload
         });
 
         if (!response.ok) {
