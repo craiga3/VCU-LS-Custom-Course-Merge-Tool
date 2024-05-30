@@ -591,7 +591,7 @@ function displayMergeSuccess(responseFromServer) {
   // Create a button for previous step
   var startOverButton = document.createElement('button');
   startOverButton.className = 'buttonmain';
-  startOverButton.style.cssFloat = 'center'; // Align to the center
+  startOverButton.style.margin = '0 auto'; 
   startOverButton.innerHTML = 'Start Over';
   startOverButton.onclick = function () {
     // Call the function for previous step
