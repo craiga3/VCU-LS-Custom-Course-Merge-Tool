@@ -1,8 +1,17 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // Extract the authorization code from the URL
+    // Extract the authorization code and error from the URL
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get('code');
-    console.log(authorizationCode);
+    const error = params.get('error');
+
+    // If there is an error and it is 'access_denied', redirect to the main page
+    if (error === 'access_denied') {
+        console.error('Authorization was denied by the user.');
+        window.location.href = '/index.html'; // Redirect to the main page
+        return;
+    }
+
+    // If no authorization code is found, log an error and stop the execution
     if (!authorizationCode) {
         console.error('No authorization code found.');
         return;
@@ -59,8 +68,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         sessionStorage.setItem('userInfo', JSON.stringify(userData));
 
         // Redirect back to the main page
-        window.location.href = responseData.homeUrl;
+        window.location.href = '/index.html'; // Redirect to the main page
     } catch (error) {
         console.error('Error during code exchange:', error);
+        window.location.href = '/index.html'; // Redirect to the main page in case of an error
     }
 });
