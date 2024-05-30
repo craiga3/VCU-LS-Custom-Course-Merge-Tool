@@ -18,7 +18,7 @@ This repository contains a custom tool developed by VCU Learning Systems to merg
 - **redirect.html:** This is a simple HTML file that displays a "Redirecting, please wait..." message during the OAuth redirect process.
 - **scripts.js:** This JavaScript file contains the logic for fetching data from the Canvas API, interacting with the user interface, and handling the course merging process.
 - **style.css:** This CSS file provides the styling for the tool's user interface.
-- **GAS.gs:** This is the Google Apps Script file that acts as the backend for the tool. It handles the authentication with Canvas, makes API calls to Canvas, and performs the actual course merging operations. Deploy the Apps Script project as an API.
+- **GAS.js:** This is the Google Apps Script file that acts as the backend for the tool. It handles the authentication with Canvas, makes API calls to Canvas, and performs the actual course merging operations. Deploy the Apps Script project as an API.
 
 ## Usage
 
