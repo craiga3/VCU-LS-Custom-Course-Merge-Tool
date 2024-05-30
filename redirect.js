@@ -4,10 +4,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authorizationCode = params.get('code');
     const error = params.get('error');
 
+    // Function to redirect to the main page
+    const redirectToMainPage = () => {
+        const currentPath = window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.href = `${currentPath}/index.html`;
+    };
+
     // If there is an error and it is 'access_denied', redirect to the main page
     if (error === 'access_denied') {
         console.error('Authorization was denied by the user.');
-        window.location.href = '/index.html'; // Redirect to the main page
+        redirectToMainPage();
         return;
     }
 
@@ -68,9 +74,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         sessionStorage.setItem('userInfo', JSON.stringify(userData));
 
         // Redirect back to the main page
-        window.location.href = '/index.html'; // Redirect to the main page
+        redirectToMainPage();
     } catch (error) {
         console.error('Error during code exchange:', error);
-        window.location.href = '/index.html'; // Redirect to the main page in case of an error
+        redirectToMainPage(); // Redirect to the main page in case of an error
     }
 });
