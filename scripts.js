@@ -25,8 +25,8 @@ function authorize() {
   .then(response => response.json())
   .then(data => {
     if (data.authorizationUrl) {
-      // Open the authorization URL in a new window/tab
-      window.open(data.authorizationUrl, '_blank'); 
+      // Navigate to the authorization URL in the same window/tab
+      window.location.href = data.authorizationUrl;
     } else {
       console.error("Error during login:", data.error); // Log the error
     }
