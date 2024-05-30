@@ -46,14 +46,13 @@ function doPost(e) {
 function getAuthorizationUrl() {
   var domain = PropertiesService.getScriptProperties().getProperty('domain_instance');
   var client_id = PropertiesService.getScriptProperties().getProperty('oauth_client_id');
-  //var redirect_uri = ScriptApp.getService().getUrl();
   var redirect_uri = PropertiesService.getScriptProperties().getProperty('redirect_uri');
 
   var authorizationUrl = domain + '/login/oauth2/auth?';
   authorizationUrl += 'response_type=code';
   authorizationUrl += '&client_id=' + client_id;
-  //authorizationUrl += '&redirect_uri=' + encodeURIComponent(redirect_uri);
   authorizationUrl += '&redirect_uri=' + redirect_uri;
+  authorizationUrl += '&scope=' + 'url:GET|/api/v1/users/:user_id/profile' + '%20' + 'url:GET|/api/v1/users/:user_id/enrollments' + '%20' + 'url:POST|/api/v1/sections/:id/crosslist/:new_course_id' + '%20' + 'url:GET|/api/v1/courses/:id';
 
   return authorizationUrl;
 }
