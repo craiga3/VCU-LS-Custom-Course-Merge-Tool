@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Function to redirect to the main page
     const redirectToMainPage = () => {
         const currentPath = window.location.pathname.split('/').slice(0, -1).join('/');
-        window.location.href = `${currentPath}/index.html`;
+        window.location.href = `${currentPath}/`;
     };
 
     // If there is an error and it is 'access_denied', redirect to the main page
