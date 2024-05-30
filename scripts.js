@@ -2,27 +2,39 @@
 var termSelectionMessageDisplayed = false;
 
 function authorize() {
-    // Send a POST request to your Apps Script endpoint for login
-    fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'action=login&accessToken=NULL' 
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.authorizationUrl) {
-        // Open the authorization URL in a new window/tab
-        window.open(data.authorizationUrl, '_blank'); 
-      } else {
-        console.error("Error during login:", data.error); // Log the error
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching authorization URL:', error); 
-    });
-  }
+  var authorizeButton = document.getElementById('authorize-btn');
+  
+    // Disable the button and change its appearance using the class
+    authorizeButton.classList.add('loading', 'blue');
+    authorizeButton.disabled = true;
+    authorizeButton.textContent = 'Launching Canvas for Login';
+
+  // Send a POST request to your Apps Script endpoint for login
+  fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'action=login&accessToken=NULL' 
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.authorizationUrl) {
+      // Open the authorization URL in a new window/tab
+      window.open(data.authorizationUrl, '_blank'); 
+    } else {
+      console.error("Error during login:", data.error); // Log the error
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching authorization URL:', error); 
+
+      // Re-enable the button and reset its appearance in case of an error
+      authorizeButton.classList.remove('loading', 'blue');
+      authorizeButton.disabled = false;
+      authorizeButton.textContent = 'Authorize Canvas Login';
+  });
+}
 
 
 function terms() {
