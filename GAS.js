@@ -1,30 +1,46 @@
-function doGet(e) {
-  // Get the authorization URL 
-  var authorizationUrl = getAuthorizationUrl(); 
+function doPost(e) {
 
-  // Return the authorization URL as JSON with CORS headers
-  return ContentService.createTextOutput(JSON.stringify({ authorizationUrl: authorizationUrl }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', 'https://craiga3.github.io');
-}
+  // Check if the request contains the accessToken and action parameters
+  if (e.parameter.accessToken && e.parameter.action) {
+    console.log('Received doPost request:', e);
+    Logger.log('Received doPost request:', e);
 
+    switch (e.parameter.action) {
 
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-    .getContent();
-}
+      case 'login':
+        var authorizationUrl = getAuthorizationUrl();
+        return ContentService.createTextOutput(JSON.stringify({ authorizationUrl: authorizationUrl })).setMimeType(ContentService.MimeType.JSON);
 
-function oauth() {
-  var domain = PropertiesService.getScriptProperties().getProperty('domain_instance');
-  var client_id = PropertiesService.getScriptProperties().getProperty('oauth_client_id');
-  var client_sec = PropertiesService.getScriptProperties().getProperty('oauth_client_secret');
+      case 'exchangeCode':
+        if (e.parameter.code) {
+          var accessToken = getAccessToken(e.parameter.code);
+          return ContentService.createTextOutput(JSON.stringify(accessToken)).setMimeType(ContentService.MimeType.JSON);
+        } else {
+          return ContentService.createTextOutput(JSON.stringify({ error: "No authorization code provided." })).setMimeType(ContentService.MimeType.JSON);
+        }
 
-  // Pass the sensitive variables to the HTML template
-  return HtmlService.createTemplateFromFile('Index')
-    .evaluate()
-    .setTitle('OAuth2 Authorization')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+      case 'getUserInfo':
+        return ContentService.createTextOutput(JSON.stringify(getUserProfile(e.parameter.accessToken))).setMimeType(ContentService.MimeType.JSON);
+
+      case 'terms':
+
+        return ContentService.createTextOutput(JSON.stringify(getTerms(e.parameter.accessToken))).setMimeType(ContentService.MimeType.JSON);
+
+      case 'getEnrollments':
+        return ContentService.createTextOutput(JSON.stringify(getCourses(e.parameter.accessToken, e.parameter.enrollmentTermId))).setMimeType(ContentService.MimeType.JSON);
+
+      case 'mergeSections':
+        return ContentService.createTextOutput(JSON.stringify(mergeWorkflow(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+
+      case 'logout':
+        return handleLogoutRequest(e.parameter.accessToken);
+
+      default:
+        return ContentService.createTextOutput('Invalid action').setMimeType(ContentService.MimeType.TEXT);
+    }
+  } else {
+    return ContentService.createTextOutput('Invalid request').setMimeType(ContentService.MimeType.TEXT);
+  }
 }
 
 function getAuthorizationUrl() {
@@ -100,55 +116,6 @@ function getUserProfile(accessToken) {
   return userData;
 }
 
-function doPost(e) {
-  // Add CORS headers for preflight OPTIONS request
-  //if (e.parameter['method'] === 'OPTIONS') {
-  //   return ContentService.createTextOutput(JSON.stringify({ status: "success", "data": "my-data" })).setMimeType(ContentService.MimeType.JSON);
-  // }
-
-  // Check if the request contains the accessToken and action parameters
-  if (e.parameter.accessToken && e.parameter.action) {
-    console.log('Received doPost request:', e);
-    Logger.log('Received doPost request:', e);
-
-    switch (e.parameter.action) {
-
-      case 'login':
-        var authorizationUrl = getAuthorizationUrl();
-        return ContentService.createTextOutput(JSON.stringify({ authorizationUrl: authorizationUrl })).setMimeType(ContentService.MimeType.JSON); 
-    
-      case 'exchangeCode':
-       if (e.parameter.code) {
-          var accessToken = getAccessToken(e.parameter.code);
-          return ContentService.createTextOutput(JSON.stringify(accessToken)).setMimeType(ContentService.MimeType.JSON);
-        } else {
-          return ContentService.createTextOutput(JSON.stringify({ error: "No authorization code provided." })).setMimeType(ContentService.MimeType.JSON);
-       }
-
-      case 'getUserInfo':
-        return ContentService.createTextOutput(JSON.stringify(getUserProfile(e.parameter.accessToken))).setMimeType(ContentService.MimeType.JSON);
-
-      case 'terms':
-       // return getTerms(e.parameter.accessToken);
-        return ContentService.createTextOutput(JSON.stringify(getTerms(e.parameter.accessToken))).setMimeType(ContentService.MimeType.JSON);
-
-      case 'getEnrollments':
-        return ContentService.createTextOutput(JSON.stringify(getCourses(e.parameter.accessToken, e.parameter.enrollmentTermId))).setMimeType(ContentService.MimeType.JSON);
-      
-      case 'mergeSections':
-        return ContentService.createTextOutput(JSON.stringify(mergeWorkflow(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-
-      case 'logout':
-        return handleLogoutRequest(e.parameter.accessToken);
-
-      default:
-        return ContentService.createTextOutput('Invalid action').setMimeType(ContentService.MimeType.TEXT);
-    }
-  } else {
-    return ContentService.createTextOutput('Invalid request').setMimeType(ContentService.MimeType.TEXT);
-  }
-}
-
 // Fetch Terms
 function getTerms(accessToken) {
   var domain = PropertiesService.getScriptProperties().getProperty('domain_instance');
@@ -206,12 +173,12 @@ function getCourses(accessToken, enrollmentTermId) {
   try {
     var response = UrlFetchApp.fetch(enrollmentAPI, options);
     var responseData = JSON.parse(response.getContentText());
-    
+
     // Array to store course details
     var courses = [];
 
     // Iterate through each enrollment and fetch course details
-    responseData.forEach(function(enrollment) {
+    responseData.forEach(function (enrollment) {
       // Fetch additional course details using the course_id
       var courseDetailsAPI = coursesAPI + enrollment.course_id;
       var courseDetailsResponse = UrlFetchApp.fetch(courseDetailsAPI, options);
@@ -253,7 +220,7 @@ function mergeWorkflow(parameter) {
   var elevatedToken = PropertiesService.getScriptProperties().getProperty('elevated_token');
   var sisid = 'CL-' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4) + Math.floor(new Date().getTime() / 1000);
   // Extract parameters from the request
-  var payload = parameter; 
+  var payload = parameter;
   var courseName = payload.course_name;
   var courseCode = courseName;
   var enrollmentTermId = payload.enrollmentTermId;
@@ -263,23 +230,23 @@ function mergeWorkflow(parameter) {
   var courseSections = payload.course_sections.split(',');
 
   // Step 1: Create a new course
-var createCourseUrl = domain + '/api/v1/accounts/' + accountId + '/courses';
-var createCourseParams = {
-  course: {
-    name: courseName,
-    course_code: courseCode,
-    term_id: enrollmentTermId,
-    sis_course_id: sisid
-  }
-};
-var createCourseOptions = {
-  method: 'post',
-  headers: {
-    'Authorization': 'Bearer ' + elevatedToken,
-    'Content-Type': 'application/json' 
-  },
-  payload: JSON.stringify(createCourseParams) 
-};
+  var createCourseUrl = domain + '/api/v1/accounts/' + accountId + '/courses';
+  var createCourseParams = {
+    course: {
+      name: courseName,
+      course_code: courseCode,
+      term_id: enrollmentTermId,
+      sis_course_id: sisid
+    }
+  };
+  var createCourseOptions = {
+    method: 'post',
+    headers: {
+      'Authorization': 'Bearer ' + elevatedToken,
+      'Content-Type': 'application/json'
+    },
+    payload: JSON.stringify(createCourseParams)
+  };
 
   var newCourseResponse = UrlFetchApp.fetch(createCourseUrl, createCourseOptions);
   var newCourseData = JSON.parse(newCourseResponse.getContentText());
@@ -319,7 +286,7 @@ var createCourseOptions = {
     name: newCourseName
   };
 
-    logVariablesToSheet(sisid, courseName, courseCode, enrollmentTermId, accountId, userID, courseSections, newCourseLink);
+  logVariablesToSheet(sisid, courseName, courseCode, enrollmentTermId, accountId, userID, courseSections, newCourseLink);
 
   return newCourse;
 }
@@ -329,7 +296,7 @@ function logVariablesToSheet(sisid, courseName, courseCode, enrollmentTermId, ac
   var sheet = SpreadsheetApp.openById(sheetId).getActiveSheet();
   var utcTimestamp = Date.now(); // Get the current UTC timestamp in milliseconds
   var humanReadableDate = new Date(utcTimestamp).toUTCString(); // Convert the timestamp to a human-readable date string
-  
+
   // Append the variables to the sheet
   sheet.appendRow([humanReadableDate, sisid, courseName, courseCode, enrollmentTermId, accountId, userID, courseSections.join(', '), newCourseLink]);
 }
