@@ -649,7 +649,7 @@ function logout() {
         var contentDiv = document.getElementById('content');
         if (contentDiv) {
           contentDiv.innerHTML =
-            '<h1>VCU Canvas Course Merging Tool</h1><p>Logout successful</p><button class="buttonmain" onclick="authorize()">Authorize Canvas Login</button>';
+            '<h1>VCU Canvas Course Merging Tool</h1><p>Logout successful</p><button id="authorize-btn" class="buttonmain authorize" onclick="authorize()">Authorize Canvas Login</button>';
         } else {
           console.error('Content div not found');
         }
