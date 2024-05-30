@@ -4,10 +4,15 @@ var termSelectionMessageDisplayed = false;
 function authorize() {
   var authorizeButton = document.getElementById('authorize-btn');
   
-    // Disable the button and change its appearance using the class
-    authorizeButton.classList.add('loading', 'blue');
-    authorizeButton.disabled = true;
-    authorizeButton.textContent = 'Launching Canvas for Login';
+  if (!authorizeButton) {
+    console.error('Authorize button not found');
+    return;
+  }
+
+  // Disable the button and change its appearance using the class
+  authorizeButton.classList.add('loading', 'blue');
+  authorizeButton.disabled = true;
+  authorizeButton.textContent = 'Launching Canvas for Login';
 
   // Send a POST request to your Apps Script endpoint for login
   fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
@@ -29,10 +34,10 @@ function authorize() {
   .catch(error => {
     console.error('Error fetching authorization URL:', error); 
 
-      // Re-enable the button and reset its appearance in case of an error
-      authorizeButton.classList.remove('loading', 'blue');
-      authorizeButton.disabled = false;
-      authorizeButton.textContent = 'Authorize Canvas Login';
+    // Re-enable the button and reset its appearance in case of an error
+    authorizeButton.classList.remove('loading', 'blue');
+    authorizeButton.disabled = false;
+    authorizeButton.textContent = 'Authorize Canvas Login';
   });
 }
 
