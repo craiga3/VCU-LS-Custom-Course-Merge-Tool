@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <base target="_top">
   <title>VCU Canvas Course Merging Tool</title>
   <link rel="stylesheet" href="resources/css/style.css">
-  <script type="text/javascript" src="//branding.vcu.edu/bar/academic/latest.js"></script> 
+  <script type="text/javascript" src="//branding.vcu.edu/bar/academic/latest.js"></script>
 </head>
 
 <body>
@@ -31,7 +32,8 @@
       </ol>
       <p>Make sure to review your selections before clicking "Merge."</p>
       <p class="reminder">
-        <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected course(s).<br>If
+        <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected
+        course(s).<br>If
         you are not the instructor in a course that needs to be merged, please ask the instructor to invite you to the
         course before completing this process.
       </p>
@@ -43,13 +45,15 @@
   </div>
 
   <footer class="infofooter">
-    <p><a href="https://go.vcu.edu/canvas" target="_blank">VCU Canvas</a><br>For support, email <a href="mailto:lsrequest@vcu.edu">LSRequest@vcu.edu</a><br>Custom tool developed by <a href="https://go.vcu.edu/learningsystems" target="_blank">VCU Learning Systems</a>
+    <p><a href="https://go.vcu.edu/canvas" target="_blank">VCU Canvas</a><br>For support, email 
+      <a href="mailto:lsrequest@vcu.edu">LSRequest@vcu.edu</a><br>Custom tool developed by 
+      <a href="https://go.vcu.edu/learningsystems" target="_blank">VCU Learning Systems</a>
     </p>
   </footer>
 
-  <script src="resources/js/scripts.js"></script> 
+  <script src="resources/js/scripts.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       var accessToken = sessionStorage.getItem('accessToken');
       var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 
@@ -71,4 +75,5 @@
     });
   </script>
 </body>
+
 </html>

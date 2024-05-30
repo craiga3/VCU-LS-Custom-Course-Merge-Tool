@@ -4,7 +4,7 @@ body {
   width: 100%;
   margin: 0 auto;
   font-family: 'Roboto', sans-serif;
-  padding: 20px; 
+  padding: 20px;
 }
 
 .body-content {
@@ -75,7 +75,7 @@ footer {
 
 form {
   margin-top: 20px;
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
 }
 
 label {
@@ -123,12 +123,12 @@ label {
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  cursor: text; 
+  cursor: text;
   padding: 0.5rem 1rem;
   font-size: 1.25rem;
   line-height: 1.5;
   border-radius: 0.3rem;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 }
 
 .selected-courses-list {
@@ -137,12 +137,12 @@ label {
 }
 
 .selected-courses-list li {
-  margin-bottom: 5px; 
+  margin-bottom: 5px;
 }
 
-.infofooter  {
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  text-align: center; 
+.infofooter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }

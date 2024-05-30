@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Send request to get User Profile
         const userPayload = new URLSearchParams();
         userPayload.append('action', 'getUserInfo');
-        userPayload.append('accessToken', responseData.accessToken); 
+        userPayload.append('accessToken', responseData.accessToken);
 
         const userResponse = await fetch('https://script.google.com/macros/s/AKfycbzUODbjTYMvw0SYDLhfdvHhSUxxVtyYt_QFEO33J2y_AXsq7X2qasNlTVrMmuukd6W_UQ/exec', {
             method: 'POST',

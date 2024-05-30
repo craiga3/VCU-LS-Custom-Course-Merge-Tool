@@ -3,7 +3,7 @@ var termSelectionMessageDisplayed = false;
 
 function authorize() {
   var authorizeButton = document.getElementById('authorize-btn');
-  
+
   if (!authorizeButton) {
     console.error('Authorize button not found');
     return;
@@ -20,25 +20,25 @@ function authorize() {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: 'action=login&accessToken=NULL' 
+    body: 'action=login&accessToken=NULL'
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.authorizationUrl) {
-      // Navigate to the authorization URL in the same window/tab
-      window.location.href = data.authorizationUrl;
-    } else {
-      console.error("Error during login:", data.error); // Log the error
-    }
-  })
-  .catch(error => {
-    console.error('Error fetching authorization URL:', error); 
+    .then(response => response.json())
+    .then(data => {
+      if (data.authorizationUrl) {
+        // Navigate to the authorization URL in the same window/tab
+        window.location.href = data.authorizationUrl;
+      } else {
+        console.error("Error during login:", data.error); // Log the error
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching authorization URL:', error);
 
-    // Re-enable the button and reset its appearance in case of an error
-    authorizeButton.classList.remove('loading', 'blue');
-    authorizeButton.disabled = false;
-    authorizeButton.textContent = 'Authorize Canvas Login';
-  });
+      // Re-enable the button and reset its appearance in case of an error
+      authorizeButton.classList.remove('loading', 'blue');
+      authorizeButton.disabled = false;
+      authorizeButton.textContent = 'Authorize Canvas Login';
+    });
 }
 
 
@@ -280,13 +280,12 @@ function displayCourses(courses, enrollmentTermId) {
   courses.forEach((course) => {
     var checkboxLabel = document.createElement('label');
     checkboxLabel.innerHTML = `
-      <input type="checkbox" name="course" value='${JSON.stringify(
-        course
-      )}'>
-      <span>${course.courseName} | SIS ID: ${
-      course.sisCourseId
-    }</span>
-    `;
+<input type="checkbox" name="course" value='${JSON.stringify(
+      course
+    )}'>
+<span>${course.courseName} | SIS ID: ${course.sisCourseId
+      }</span>
+`;
     gridContainer.appendChild(checkboxLabel);
 
     // Add an event listener to the checkbox
