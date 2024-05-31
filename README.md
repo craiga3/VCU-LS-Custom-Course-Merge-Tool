@@ -29,6 +29,25 @@ This repository contains a custom tool developed by VCU Learning Systems to merg
 5. **Authorize Canvas Login:**  Click the "Authorize Canvas Login" button and follow the prompts to grant the tool access to your Canvas account.
 6. **Follow the on-screen instructions:** Select the term and courses you want to merge, provide a name for the parent course, and confirm the merge.
 
+## Configuring 
+
+1. **Script Properties:** Several sensitive variables are configured as Script Properties, as to not hardcode any sensitive values in the Middleware or Frontend. The following script properties must be configured.
+    * `domain_instance`: The domain for your Canvas instance: `https://<instance>.instructure.com`
+    * `elevated_token`: An API token provided from an administrative service account. This is used for creating the new course shell and getting enrollment terms in Canvas
+    * `home_uri`: The 'homepage' of this tool, also can be the DNS record
+    * `oauth_client_id`: The OAUTH2 Client ID from the Developer API token configuration in Canvas
+    * `oauth_client_secret`: The OAUTH2 Secret from the Developer API token configuration in Canvas
+    * `redirect_uri`: the URL of the `redirect.html` page from this tool. Will likely be `https://<DNSForTool>.edu/redirect.html`
+2. **Canvas API Token Properties**: These values need to be configured for the API Key Settings in Canvas. 
+    * `Key Name`: Give the key a name. This is what will be shown with the OAUTH2 Authorization page.
+    * `Owner Email`: Optional - but generally a good idea to have the email of the responsible party for support.
+    * `Redirect URIs`: the same value entered in the Apps Script Property with the same name. `https://<DNSForTool>.edu/redirect.html`
+3. **API Token Scope**: The Developer API token in Canvas can be scoped to the following API Calls (When configuring, also check the box for `Allow Include Parameters`.)
+    * `url:GET|/api/v1/users/:user_id/profile`
+    * `url:GET|/api/v1/users/:user_id/enrollments`
+    * `url:GET|/api/v1/courses/:id`
+    * `url:POST|/api/v1/sections/:id/crosslist/:new_course_id`
+
 ## Support 
 
 For support or to report any issues, please email **LSRequest@vcu.edu**. 
