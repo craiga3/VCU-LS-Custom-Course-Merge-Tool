@@ -227,6 +227,14 @@ function getEnrollments(enrollmentTermId) {
 }
 
 function displayCourses(courses, enrollmentTermId) {
+    // Sort the courses alphanumerically by courseName
+    courses.sort((a, b) => {
+      const nameA = a.courseName.toLowerCase();
+      const nameB = b.courseName.toLowerCase();
+      if (nameA < nameB) return -1;
+      if (nameA > nameB) return 1;
+      return 0;
+    });
   // Get the container element to replace its content
   var processContainer = document.getElementById('process-container');
 
