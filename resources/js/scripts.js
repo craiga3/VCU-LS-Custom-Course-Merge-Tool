@@ -70,7 +70,7 @@ function terms() {
     .then((response) => response.json())
     .then((data) => {
       // Handle the returned data (enrollment terms) here
-      console.log(data);
+      // console.log(data);
       // Update your HTML with the received data
       displayTerms(data);
     })
@@ -161,7 +161,7 @@ function displayTerms(terms) {
     // ...
 
     // For demonstration purposes, log the selected term ID
-    console.log('Selected Term ID:', selectedTermId);
+    // console.log('Selected Term ID:', selectedTermId);
 
     // Trigger the getEnrollments action with the selected term ID
     getEnrollments(selectedTermId);
@@ -210,7 +210,7 @@ function getEnrollments(enrollmentTermId) {
     .then((response) => response.json())
     .then((data) => {
       // Handle the returned data (enrollments) here
-      console.log('Enrollments:', data);
+      // console.log('Enrollments:', data);
 
       // Update your HTML or perform further actions as needed
       displayCourses(data, enrollmentTermId); // Pass enrollmentTermId to displayCourses
@@ -448,8 +448,8 @@ function displayParentCourseDetails(selectedCourses, enrollmentTermId) {
     // Proceed to the next step with the provided parent course name and selected courses
     displayConfirmationScreen(parentCourseName, selectedCourses, enrollmentTermId);
     // Here you might want to call the function that handles the next step of the process
-    console.log('Parent Course Name:', parentCourseName);
-    console.log('Selected Courses:', selectedCourses);
+    // console.log('Parent Course Name:', parentCourseName);
+    // console.log('Selected Courses:', selectedCourses);
     // Example: Call a function to show confirmation screen
     // showConfirmationScreen(parentCourseName, selectedCourses);
   };
@@ -554,7 +554,7 @@ function mergeCourses(parentCourseName, selectedCourses) {
       accountId: accountId,
     };
 
-    console.log('Merge Payload:', payload);
+    // console.log('Merge Payload:', payload);
 
     // Convert payload to URL-encoded string
     var payloadString = Object.keys(payload)
@@ -583,7 +583,7 @@ function mergeCourses(parentCourseName, selectedCourses) {
       })
       .then((data) => {
         // Handle the response data here
-        console.log('Response from server:', data);
+        // console.log('Response from server:', data);
         // Call displayMergeSuccess if merge was successful
         displayMergeSuccess(data);
       })
@@ -660,7 +660,7 @@ function logout() {
   )
     .then((response) => response.text()) // Get the text content from the response
     .then((message) => {
-      console.log('Logout response:', message);
+      // console.log('Logout response:', message);
 
       // Check the response message and update the UI accordingly
       if (message === 'Logout successful') {

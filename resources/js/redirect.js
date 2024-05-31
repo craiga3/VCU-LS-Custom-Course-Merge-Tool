@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const responseData = await response.json();
 
         // Handle the response from Google Apps Script
-        console.log('Response from Google Apps Script:', responseData);
+        // console.log('Response from Google Apps Script:', responseData);
 
         // Store the access token in session storage
         sessionStorage.setItem('accessToken', responseData.accessToken);
