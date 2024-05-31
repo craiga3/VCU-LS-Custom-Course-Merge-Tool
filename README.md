@@ -50,6 +50,6 @@ This repository contains a custom tool developed by VCU Learning Systems to merg
 
 ## Support 
 
-For support or to report any issues, please email **LSRequest@vcu.edu**. 
+Coming Soon
 
 **Note:** To use this tool, you must have a teacher enrollment in the Canvas courses you want to merge.
