@@ -157,12 +157,6 @@ function displayTerms(terms) {
     // Reset the flag when 'Next' button is clicked
     termSelectionMessageDisplayed = false;
 
-    // Perform the next step based on the selected term ID (e.g., show courses)
-    // ...
-
-    // For demonstration purposes, log the selected term ID
-    // console.log('Selected Term ID:', selectedTermId);
-
     // Trigger the getEnrollments action with the selected term ID
     getEnrollments(selectedTermId);
   };
@@ -210,8 +204,6 @@ function getEnrollments(enrollmentTermId) {
     .then((response) => response.json())
     .then((data) => {
       // Handle the returned data (enrollments) here
-      // console.log('Enrollments:', data);
-
       // Update your HTML or perform further actions as needed
       displayCourses(data, enrollmentTermId); // Pass enrollmentTermId to displayCourses
     })
@@ -447,11 +439,6 @@ function displayParentCourseDetails(selectedCourses, enrollmentTermId) {
 
     // Proceed to the next step with the provided parent course name and selected courses
     displayConfirmationScreen(parentCourseName, selectedCourses, enrollmentTermId);
-    // Here you might want to call the function that handles the next step of the process
-    // console.log('Parent Course Name:', parentCourseName);
-    // console.log('Selected Courses:', selectedCourses);
-    // Example: Call a function to show confirmation screen
-    // showConfirmationScreen(parentCourseName, selectedCourses);
   };
 
   // Add the next button to the process container
@@ -525,7 +512,7 @@ function mergeCourses(parentCourseName, selectedCourses) {
   // Get the userInfo from session storage
   var userInfoString = sessionStorage.getItem('userInfo');
 
-  // Parse the userInfoString to JSON (it's likely already a JSON string, so no need for double parsing)
+  // Parse the userInfoString to JSON
   var userInfoJson;
   try {
     userInfoJson = JSON.parse(userInfoString);
@@ -554,8 +541,6 @@ function mergeCourses(parentCourseName, selectedCourses) {
       accountId: accountId,
     };
 
-    // console.log('Merge Payload:', payload);
-
     // Convert payload to URL-encoded string
     var payloadString = Object.keys(payload)
       .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(payload[key]))
@@ -571,7 +556,6 @@ function mergeCourses(parentCourseName, selectedCourses) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        // You may need to include additional headers if required by your API
       },
       body: payloadString,
     })
@@ -583,7 +567,6 @@ function mergeCourses(parentCourseName, selectedCourses) {
       })
       .then((data) => {
         // Handle the response data here
-        // console.log('Response from server:', data);
         // Call displayMergeSuccess if merge was successful
         displayMergeSuccess(data);
       })
@@ -660,7 +643,7 @@ function logout() {
   )
     .then((response) => response.text()) // Get the text content from the response
     .then((message) => {
-      // console.log('Logout response:', message);
+
 
       // Check the response message and update the UI accordingly
       if (message === 'Logout successful') {
