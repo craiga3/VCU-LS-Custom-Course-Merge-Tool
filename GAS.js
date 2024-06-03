@@ -260,7 +260,6 @@ function mergeWorkflow(parameter) {
   var createEnrollmentOptions = createCourseOptions;
 
   // Step 2: Enroll the teacher into the new course
-  // Implement this step based on your enrollment logic
 
   var enrollUrl = domain + '/api/v1/courses/'
     + newCourseId
