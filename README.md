@@ -38,6 +38,7 @@ This repository contains a custom tool developed by VCU Learning Systems to merg
     * `oauth_client_id`: The OAUTH2 Client ID from the Developer API token configuration in Canvas
     * `oauth_client_secret`: The OAUTH2 Secret from the Developer API token configuration in Canvas
     * `redirect_uri`: the URL of the `redirect.html` page from this tool. Will likely be `https://<DNSForTool>.edu/redirect.html`
+    * `logger_script_id`: the ID of the Google Sheet that will be used for Logging API activity. The sheet ID is found in the Sheet URL (example: `https://docs.google.com/spreadsheets/d/{SHEET-ID}/edit`)
 2. **Canvas API Token Properties**: These values need to be configured for the API Key Settings in Canvas. 
     * `Key Name`: Give the key a name. This is what will be shown with the OAUTH2 Authorization page.
     * `Owner Email`: Optional - but generally a good idea to have the email of the responsible party for support.
