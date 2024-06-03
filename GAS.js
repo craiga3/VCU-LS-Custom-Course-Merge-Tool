@@ -296,7 +296,7 @@ function mergeWorkflow(parameter) {
 }
 
 function logVariablesToSheet(sisid, courseName, courseCode, enrollmentTermId, accountId, userID, courseSections, newCourseLink) {
-  var sheetId = "1cjGsdZnuvnLbB8egJiNKz3wX6Na2MEU74Ss_m1zjW48"; // Replace with the ID of your Google Sheet
+  var sheetId = PropertiesService.getScriptProperties().getProperty('logger_sheet_id'); // script property for sheet ID
   var sheet = SpreadsheetApp.openById(sheetId).getActiveSheet();
   var utcTimestamp = Date.now(); // Get the current UTC timestamp in milliseconds
   var humanReadableDate = new Date(utcTimestamp).toUTCString(); // Convert the timestamp to a human-readable date string
