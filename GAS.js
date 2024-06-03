@@ -91,8 +91,6 @@ function getAccessToken(code) {
 
   // Use the tokenData to make authenticated requests to Canvas API
   var access_token = tokenData.access_token;
-  // Save access_token for future use
-
   // Construct the response object
   var responseData = {
     accessToken: access_token,
@@ -155,7 +153,7 @@ function getTerms(accessToken) {
 
     return enrollmentTerms;
   } catch (error) {
-    // Handle error appropriately (logging, returning an error response, etc.)
+    // Handle error
     console.error('Error fetching enrollment terms:', error);
     return { error: 'Error fetching enrollment terms' };
   }
@@ -199,7 +197,6 @@ function getCourses(accessToken, enrollmentTermId) {
           sisCourseId: courseDetails.sis_course_id,
           accountId: courseDetails.account_id,
           termId: courseDetails.enrollment_term_id
-          // Add more fields as needed
         };
 
         // Push course details to the array
@@ -211,7 +208,7 @@ function getCourses(accessToken, enrollmentTermId) {
     Logger.log(courses);
     return courses;
   } catch (error) {
-    // Handle error appropriately
+    // Handle error
     Logger.log('Error:', error);
     return null;
   }
@@ -323,8 +320,6 @@ function handleLogoutRequest(accessToken) {
 
     // Check the status code and send the appropriate response
     if (response.getResponseCode() === 200) {
-      // Additional cleanup logic if needed
-
       // Send a success response
       return ContentService.createTextOutput('Logout successful').setMimeType(ContentService.MimeType.TEXT);
     } else {

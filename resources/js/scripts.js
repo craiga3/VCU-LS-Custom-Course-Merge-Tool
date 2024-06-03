@@ -70,8 +70,7 @@ function terms() {
     .then((response) => response.json())
     .then((data) => {
       // Handle the returned data (enrollment terms) here
-      // console.log(data);
-      // Update your HTML with the received data
+      // Update HTML with the received data
       displayTerms(data);
     })
     .catch((error) => {
@@ -109,10 +108,7 @@ function displayTerms(terms) {
   terms.forEach((term) => {
     var label = document.createElement('label');
     label.innerHTML =
-      '<input type="radio" name="term" value="' +
-      term.id +
-      '"> ' +
-      term.name;
+      '<input type="radio" name="term" value="' + term.id + '"> ' + term.name;
     form.appendChild(label);
     form.appendChild(document.createElement('br'));
   });
@@ -204,7 +200,7 @@ function getEnrollments(enrollmentTermId) {
     .then((response) => response.json())
     .then((data) => {
       // Handle the returned data (enrollments) here
-      // Update your HTML or perform further actions as needed
+      // Update HTML
       displayCourses(data, enrollmentTermId); // Pass enrollmentTermId to displayCourses
     })
     .catch((error) => {
