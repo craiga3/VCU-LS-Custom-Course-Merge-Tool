@@ -99,7 +99,7 @@ function displayTerms(terms) {
 
   // Instructions for Selecting Term
   var instructions = document.createElement('p');
-  instructions.innerHTML = "Please select the term for the courses you'd like to merge:<br>The more courses you are assigned, the longer they may take to load.";
+  instructions.innerHTML = "Please select the term for the courses you'd like to merge:<br>The more courses you are assigned, the longer the next step will take to load.";
   processContainer.appendChild(instructions);
 
   // Create a form element to hold the radio buttons
