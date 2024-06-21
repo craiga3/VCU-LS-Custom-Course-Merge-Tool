@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (errorMessage) {
             url.searchParams.append('error', errorMessage);
         }
-        window.location.href = url.toString();
+        window.location.href = `${currentPath}/`;
     };
 
     if (error === 'access_denied') {
