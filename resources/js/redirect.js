@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!authorizationCode) {
         console.error('No authorization code found.');
-        redirectToMainPage('Error processing authorization. Please try again. If issue persists, please email the support email located at the bottom of this page');
+        redirectToMainPage('Error processing authorization. Please try again. If issue persists, please email the support email located at the bottom of this page.');
         return;
     }
 
