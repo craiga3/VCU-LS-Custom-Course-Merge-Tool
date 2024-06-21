@@ -17,7 +17,7 @@
       <span class="pipe">|</span>
       <p>Email: <span id="user-email"></span></p>
     </div>
-
+    <div id="error-message-container" style="display:none; color: red;"></div>
     <div class="processcontainer" id="process-container">
       <!-- Content to be updated dynamically based on steps -->
       <h2>How to use this tool</h2>
@@ -33,10 +33,7 @@
       </ol>
       <p>Make sure to review your selections before clicking "Merge."</p>
       <p class="reminder">
-        <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected
-        course(s).<br>If
-        you are not the instructor in a course that needs to be merged, please ask the instructor to invite you to the
-        course before completing this process.
+        <strong>Important:</strong> To merge courses, you must have a teacher enrollment in the selected course(s).<br>If you are not the instructor in a course that needs to be merged, please ask the instructor to invite you to the course before completing this process.
       </p>
       <button class="buttonmain" onclick="terms()">Next</button>
     </div>
@@ -67,6 +64,19 @@
         document.getElementById('user-info').style.display = 'none';
         document.getElementById('process-container').style.display = 'none';
         document.querySelector('.logout').style.display = 'none';
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get('error');
+
+      if (error) {
+        const errorMessageContainer = document.getElementById('error-message-container');
+        if (errorMessageContainer) {
+          errorMessageContainer.textContent = error;
+          errorMessageContainer.style.display = 'block';
+        } else {
+          console.error('Error container not found.');
+        }
       }
     });
   </script>
