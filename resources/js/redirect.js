@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // If no authorization code is found, log an error and stop the execution
     if (!authorizationCode) {
         console.error('No authorization code found.');
+        redirectToMainPage();
         return;
     }
 
