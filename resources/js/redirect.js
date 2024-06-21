@@ -3,12 +3,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authorizationCode = params.get('code');
     const error = params.get('error');
 
-    const redirectToMainPage = (errorMessage = '') => {
+    // Function to redirect to the main page
+    const redirectToMainPage = () => {
         const currentPath = window.location.pathname.split('/').slice(0, -1).join('/');
-        const url = new URL(`${currentPath}/`);
-        if (errorMessage) {
-            url.searchParams.append('error', errorMessage);
-        }
         window.location.href = `${currentPath}/`;
     };
 
