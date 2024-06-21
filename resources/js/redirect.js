@@ -3,10 +3,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authorizationCode = params.get('code');
     const error = params.get('error');
 
-    // Function to redirect to the main page
     const redirectToMainPage = (errorMessage = '') => {
+        const basePath = window.location.origin; // Use origin to construct the base path
         const currentPath = window.location.pathname.split('/').slice(0, -1).join('/');
-        const url = new URL(`${currentPath}/`);
+        const url = new URL(`${basePath}${currentPath}/`);
         if (errorMessage) {
             url.searchParams.append('error', errorMessage);
         }
