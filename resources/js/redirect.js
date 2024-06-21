@@ -4,9 +4,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const error = params.get('error');
 
     // Function to redirect to the main page
-    const redirectToMainPage = () => {
+    const redirectToMainPage = (errorMessage = '') => {
         const currentPath = window.location.pathname.split('/').slice(0, -1).join('/');
-        window.location.href = `${currentPath}/`;
+        const url = new URL(`${currentPath}/`);
+        if (errorMessage) {
+            url.searchParams.append('error', errorMessage);
+        }
+        window.location.href = url.toString();
     };
 
     if (error === 'access_denied') {
