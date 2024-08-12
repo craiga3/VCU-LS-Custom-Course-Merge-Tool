@@ -118,15 +118,24 @@ function displayTerms(terms) {
   nextButton.className = 'buttonmain';
   nextButton.innerHTML = 'Next';
   nextButton.onclick = function () {
+
     // Get the selected term ID
     var selectedTermId;
     var radioButtons = form.elements['term'];
-    for (var i = 0; i < radioButtons.length; i++) {
-      if (radioButtons[i].checked) {
-        selectedTermId = radioButtons[i].value;
-        break;
-      }
+
+    if (radioButtons.length) {
+        // If there are multiple radio buttons (more than one option)
+        for (var i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                selectedTermId = radioButtons[i].value;
+                break;
+            }
+        }
+    } else if (radioButtons.checked) {
+        // If there's only one radio button (one option)
+        selectedTermId = radioButtons.value;
     }
+
 
     // Clear the message if it was displayed before
     var selectionMessage = processContainer.querySelector('.reminder.selection');
