@@ -58,7 +58,6 @@ function getAuthorizationUrl() {
   authorizationUrl += '%20url:POST|/api/v1/sections/:id/crosslist/:new_course_id';
   authorizationUrl += '%20url:GET|/api/v1/courses/:id';
 
-
   return authorizationUrl;
 }
 
@@ -91,6 +90,8 @@ function getAccessToken(code) {
 
   // Use the tokenData to make authenticated requests to Canvas API
   var access_token = tokenData.access_token;
+  // Save access_token for future use
+
   // Construct the response object
   var responseData = {
     accessToken: access_token,
@@ -153,7 +154,7 @@ function getTerms(accessToken) {
 
     return enrollmentTerms;
   } catch (error) {
-    // Handle error
+    // Handle error appropriately (logging, returning an error response, etc.)
     console.error('Error fetching enrollment terms:', error);
     return { error: 'Error fetching enrollment terms' };
   }
@@ -186,33 +187,35 @@ function getCourses(accessToken, enrollmentTermId) {
       var courseDetailsResponse = UrlFetchApp.fetch(courseDetailsAPI, options);
       var courseDetails = JSON.parse(courseDetailsResponse.getContentText());
 
-      // Filter out courses with sisCourseId starting with "CL-"
-      if (!courseDetails.sis_course_id || !courseDetails.sis_course_id.startsWith('CL-')) {
-        // Extract relevant information
-        var course = {
-          courseId: enrollment.course_id,
-          courseSectionId: enrollment.course_section_id,
-          courseName: courseDetails.name,
-          courseCode: courseDetails.course_code,
-          sisCourseId: courseDetails.sis_course_id,
-          accountId: courseDetails.account_id,
-          termId: courseDetails.enrollment_term_id
-        };
-
-        // Push course details to the array
-        courses.push(course);
+      // Filter out courses with invalid sis_course_id
+      if (!courseDetails.sis_course_id || courseDetails.sis_course_id.startsWith('CL-') || /^[A-Za-z]\d{7}$/.test(courseDetails.sis_course_id)) {
+        return;  // Skip this course
       }
+
+      // Extract relevant information
+      var course = {
+        courseId: enrollment.course_id,
+        courseSectionId: enrollment.course_section_id,
+        courseName: courseDetails.name,
+        courseCode: courseDetails.course_code,
+        sisCourseId: courseDetails.sis_course_id,
+        accountId: courseDetails.account_id,
+        termId: courseDetails.enrollment_term_id
+        // Add more fields as needed
+      };
+
+      // Push course details to the array
+      courses.push(course);
     });
 
-    // Log or return the courses array as needed
-    Logger.log(courses);
-    return courses;
+    return courses;  // Return the filtered list of courses
+
   } catch (error) {
-    // Handle error
-    Logger.log('Error:', error);
-    return null;
+    Logger.log('Error fetching courses: ' + error.message);
+    return [];
   }
 }
+
 
 
 // Create New Course - Enroll Teacher - Merge Sections
@@ -257,6 +260,7 @@ function mergeWorkflow(parameter) {
   var createEnrollmentOptions = createCourseOptions;
 
   // Step 2: Enroll the teacher into the new course
+  // Implement this step based on your enrollment logic
 
   var enrollUrl = domain + '/api/v1/courses/'
     + newCourseId
@@ -320,6 +324,8 @@ function handleLogoutRequest(accessToken) {
 
     // Check the status code and send the appropriate response
     if (response.getResponseCode() === 200) {
+      // Additional cleanup logic if needed
+
       // Send a success response
       return ContentService.createTextOutput('Logout successful').setMimeType(ContentService.MimeType.TEXT);
     } else {
